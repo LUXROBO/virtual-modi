@@ -1,0 +1,5 @@
+# dirs
+.idea/
+
+# files
+.DS_Store

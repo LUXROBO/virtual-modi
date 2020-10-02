@@ -1,2 +1,3 @@
 # virtual-modi
-Implementation of virtual MODI modules written in Python :)
+Implementation of virtual MODI modules written in Python.
+
