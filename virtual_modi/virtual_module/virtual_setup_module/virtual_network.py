@@ -1,6 +1,9 @@
 
-class VirtualNetwork:
+from virtual_modi.virtual_module.virtual_module import VirtualModule
+
+
+class VirtualNetwork(VirtualModule):
 
     def __init__(self):
-        # network virtual_module cannot have left neighbor
-        self.neighbors.pop("l")
+        self.topology.pop("l") # network module cannot have the left neighbor
+        self.esp32_verison = None
