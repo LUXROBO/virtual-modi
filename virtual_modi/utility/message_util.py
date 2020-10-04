@@ -1,5 +1,6 @@
 
 import json
+import struct
 
 from base64 import b64encode, b64decode
 
@@ -23,6 +24,20 @@ def decode_message(message):
     data = msg['b']
     dlc = msg['l']
     return cmd, sid, did, data, dlc
+
+
+def decode_data(data: str) -> float:
+    return round(struct.unpack('f', bytes(unpack_data(data)[:4]))[0], 2)
+
+
+def unpack_data(data, structure=(1, 1, 1, 1, 1, 1, 1, 1)):
+    data = bytearray(b64decode(data.encode('utf8')))
+    idx = 0
+    result = []
+    for size in structure:
+        result.append(int.from_bytes(data[idx:idx + size], byteorder='little'))
+        idx += size
+    return result
 
 
 #

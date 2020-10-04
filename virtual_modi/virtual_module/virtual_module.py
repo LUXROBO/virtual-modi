@@ -1,48 +1,67 @@
 
 from random import randint
+from abc import ABC
 from abc import abstractmethod
 
 from virtual_modi.utility.message_util import parse_message
+from virtual_modi.utility.message_util import decode_message
 
 
-class VirtualModule:
+class VirtualModule(ABC):
     def __init__(self):
 
-        # static info
+        # List static info
         self.id = None
         self.uuid = None
         self.type = None
         self.stm32_version = '1.0.0'
 
-        # dynamic info
+        # List dynamic info
         self.topology = {'r': 0, 't': 0, 'l': 0, 'b': 0}
+        self.attached = True
 
-        # Once created (i.e. attached), send assignment, topology once
-        # Then send out health and property messages continuously
+        # Messages to send to the local machine (i.e. PC)
+        self.messages_to_send = []
+
+        # Once attached, send assignment and topology messages once
+        self.send_assignment_message()
+        self.send_topology_message()
+
+    def process_received_message(self, message):
+        cmd, *_ = decode_message(message)
+
+        if cmd == 3:
+            self.process_received_property_message(message)
+            return
+
+        # If cmd is not module specific
+        process_message = {
+            7: self.send_topology_message,
+            8: self.send_assignment_message,
+        }.get(cmd, lambda _: None)
+        process_message()
 
     @abstractmethod
-    def process_received_message(self, msg):
-        # TODO: Handle modi commands (i.e. modi instructions) below
-        # 7, 8, 9
+    def process_received_property_message(self, message):
         pass
 
-    def create_health_message(self):
+    def send_health_message(self):
         cpu_rate = randint(0, 100)
         bus_rate = randint(0, 100)
         mem_rate = randint(0, 100)
         battery_voltage = 0
         module_state = 2
 
-        # TODO: Handle `reserved` bytes?
+        # TODO: Handle 'reserved' bytes?
         health_message = parse_message(
             0, self.id, 0,
             byte_data=(
                 cpu_rate, bus_rate, mem_rate, battery_voltage, module_state
             )
         )
-        return health_message
+        self.messages_to_send.append(health_message)
 
-    def create_assignment_message(self):
+    def send_assignment_message(self):
         stm32_version_digits = [int(d) for d in self.stm32_version.split('.')]
         stm32_version = (
                 stm32_version_digits[0] << 13
@@ -54,9 +73,9 @@ class VirtualModule:
         assignment_message = parse_message(
             5, self.id, 4095, byte_data=(module_uuid, stm32_version)
         )
-        return assignment_message
+        self.messages_to_send.append(assignment_message)
 
-    def create_topology_message(self):
+    def send_topology_message(self):
         topology_data = bytearray(8)
         for i, (_, module_id) in enumerate(self.topology.items()):
             curr_module_id = module_id.to_bytes(2, 'little')
@@ -65,16 +84,11 @@ class VirtualModule:
         topology_message = parse_message(
             7, self.id, 0, byte_data=topology_data
         )
-        return topology_message
+        self.messages_to_send.append(topology_message)
 
-    def create_property_message(self):
-        property_value = self.create_property_value()
+    def send_property_message(self, property_number, property_value):
+        property_value_in_bytes = property_value.to_bytes(8, 'little')
         property_message = parse_message(
-            31, self.id, 0, byte_data=property_value
+            31, self.id, property_number, byte_data=property_value_in_bytes
         )
-        return property_message
-
-    # Each module has different property defined, thus each module inherits it
-    @abstractmethod
-    def create_property_value(self):
-        pass
+        self.messages_to_send.append(property_message)
