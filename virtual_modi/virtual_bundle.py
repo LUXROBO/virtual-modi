@@ -55,25 +55,22 @@ class VirtualBundle:
     #
     # Helper functions below
     #
+    def create_new_module(self, module_type):
+        module_template = self.create_module_from_type(module_type)
+        module_instance = module_template()
+        self.attached_virtual_modules.append(module_instance)
+        print(f"{str(module_instance)} has been created!")
+        return module_instance
+
     @staticmethod
-    def create_module_from_name(module_type):
+    def create_module_from_type(module_type):
         module_type = module_type[0].lower() + module_type[1:]
         module_name = module_type[0].upper() + module_type[1:]
-        virtual_module_path = 'virtual_module.virtual'
-        module_module = (
-            find_spec(f'{virtual_module_path}.input_module.{module_type}')
-            or find_spec(f'{virtual_module_path}.output_module.{module_type}')
-            or find_spec(f'{virtual_module_path}.setup_module.{module_type}')
+        module_path = 'virtual_modi.virtual_module.virtual'
+        module_module_template = (
+            find_spec(f'{module_path}.input_module.{module_type}')
+            or find_spec(f'{module_path}.output_module.{module_type}')
+            or find_spec(f'{module_path}.setup_module.{module_type}')
         )
-        module_module = module_module.loader.load_module()
+        module_module = module_module_template.loader.load_module()
         return getattr(module_module, module_name)
-
-    def create_new_module(self):
-        vmodule_template = get_module_from_name(module_type)
-        vmodule_instance = module_template(
-            module_id, module_uuid, self._conn
-        )
-        vmodule_instance.version = module_version_info
-        self.attached_vmodules.append(module_instance)
-        print(f"{str(module_instance)} has been connected!")
-        return module_instance
