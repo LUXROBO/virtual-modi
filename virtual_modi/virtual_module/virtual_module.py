@@ -27,11 +27,15 @@ class VirtualModule(ABC):
         self.send_assignment_message()
         self.send_topology_message()
 
+    @abstractmethod
+    def run(self):
+        pass
+
     def process_received_message(self, message):
         cmd, *_ = decode_message(message)
 
-        if cmd == 3:
-            self.process_received_property_message(message)
+        if cmd == 4:
+            self.process_set_property_message(message)
             return
 
         # If cmd is not module specific
@@ -41,8 +45,7 @@ class VirtualModule(ABC):
         }.get(cmd, lambda _: None)
         process_message()
 
-    @abstractmethod
-    def process_received_property_message(self, message):
+    def process_set_property_message(self, message):
         pass
 
     def send_health_message(self):

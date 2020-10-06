@@ -10,6 +10,7 @@ class VirtualButton(VirtualModule):
     TOGGLED = 5
 
     def __init__(self):
+        super(VirtualButton, self).__init__()
         self.is_toggled = False
 
     def click(self):
@@ -32,4 +33,3 @@ class VirtualButton(VirtualModule):
         self.send_property_message(self.PRESSED, 0)
         toggled_value = 100 if self.is_toggled else 0
         self.send_property_message(self.TOGGLED, toggled_value)
-
