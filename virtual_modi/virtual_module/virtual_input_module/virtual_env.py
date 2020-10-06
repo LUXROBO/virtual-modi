@@ -13,6 +13,7 @@ class VirtualEnv(VirtualModule):
 
     def __init__(self):
         super(VirtualEnv, self).__init__()
+        self.type = 'env'
         self.uuid = self.generate_uuid(0x2000)
 
         self.brightness = 0

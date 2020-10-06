@@ -11,6 +11,7 @@ class VirtualButton(VirtualModule):
 
     def __init__(self):
         super(VirtualButton, self).__init__()
+        self.type = 'button'
         self.uuid = self.generate_uuid(0x2030)
 
         self.is_toggled = False

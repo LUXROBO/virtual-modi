@@ -14,6 +14,7 @@ class VirtualMotor(VirtualModule):
     LOWER_ANGLE = 14
 
     def __init__(self):
+        self.type = 'led'
         self.uuid = self.generate_uuid(0x4010)
         self.speed = 0, 0
         self.angle = 0, 0

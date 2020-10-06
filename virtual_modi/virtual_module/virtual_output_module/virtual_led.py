@@ -13,6 +13,7 @@ class VirtualLed(VirtualModule):
 
     def __init__(self):
         super(VirtualLed, self).__init__()
+        self.type = 'led'
         self.uuid = self.generate_uuid(0x4020)
 
         self.rgb = 0, 0, 0

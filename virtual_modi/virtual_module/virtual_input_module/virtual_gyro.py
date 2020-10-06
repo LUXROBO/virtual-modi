@@ -17,6 +17,7 @@ class VirtualGyro(VirtualModule):
 
     def __init__(self):
         super(VirtualGyro, self).__init__()
+        self.type = 'gyro'
         self.uuid = self.generate_uuid(0x2010)
 
         self.roll = 0

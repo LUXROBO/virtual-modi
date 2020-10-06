@@ -12,6 +12,7 @@ class VirtualSpeaker(VirtualModule):
 
     def __init__(self):
         super(VirtualSpeaker, self).__init__()
+        self.type = 'speaker'
         self.uuid = self.generate_uuid(0x4030)
 
         self.tune = 1318, 0

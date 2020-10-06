@@ -9,6 +9,7 @@ class VirtualDisplay(VirtualModule):
 
     def __init__(self):
         super(VirtualDisplay, self).__init__()
+        self.type = 'display'
         self.uuid = self.generate_uuid(0x4000)
 
         self.text_buffer = []
