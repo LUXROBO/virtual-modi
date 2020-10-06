@@ -8,6 +8,8 @@ class VirtualUltrasonic(VirtualModule):
 
     def __init__(self):
         super(VirtualUltrasonic, self).__init__()
+        self.uuid = self.generate_uuid(0x2050)
+
         self.distance = 0
 
     def run(self):

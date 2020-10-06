@@ -9,6 +9,8 @@ class VirtualMic(VirtualModule):
 
     def __init__(self):
         super(VirtualMic, self).__init__()
+        self.uuid = self.generate_uuid(0x2020)
+
         self.volume = 0
         self.frequency = 0
 

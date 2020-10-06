@@ -7,6 +7,7 @@ class VirtualNetwork(VirtualModule):
     def __init__(self):
         super(VirtualNetwork, self).__init__()
         self.type = 'network'
+        self.uuid = self.generate_uuid(0x0000)
 
         # Network module specific
         self.topology.pop("l")

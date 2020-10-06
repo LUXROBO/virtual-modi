@@ -8,6 +8,7 @@ class VirtualIr(VirtualModule):
 
     def __init__(self):
         super(VirtualIr, self).__init__()
+        self.uuid = self.generate_uuid(0x2060)
         self.proximity = 0
 
     def run(self):

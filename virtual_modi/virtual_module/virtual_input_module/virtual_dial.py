@@ -9,6 +9,8 @@ class VirtualDial(VirtualModule):
 
     def __init__(self):
         super(VirtualDial, self).__init__()
+        self.uuid = self.generate_uuid(0x2040)
+
         self.degree = 0
         self.turnspeed = 0
 

@@ -12,6 +12,8 @@ class VirtualSpeaker(VirtualModule):
 
     def __init__(self):
         super(VirtualSpeaker, self).__init__()
+        self.uuid = self.generate_uuid(0x4030)
+
         self.tune = 1318, 0
 
     def process_set_property_message(self, message):

@@ -11,7 +11,6 @@ class VirtualModule(ABC):
     def __init__(self):
 
         # List static info
-        self.id = None
         self.uuid = None
         self.type = None
         self.stm32_version = '1.0.0'
@@ -26,6 +25,10 @@ class VirtualModule(ABC):
         # Once attached, send assignment and topology messages once
         self.send_assignment_message()
         self.send_topology_message()
+
+    @property
+    def id(self):
+        return self.uuid % 0x10000
 
     @abstractmethod
     def run(self):
@@ -48,6 +51,10 @@ class VirtualModule(ABC):
     def process_set_property_message(self, message):
         pass
 
+    @staticmethod
+    def generate_uuid(module_type_prefix):
+        return module_type_prefix << 32 | randint(1, 0x99999999)
+
     def send_health_message(self):
         cpu_rate = randint(0, 100)
         bus_rate = randint(0, 100)
@@ -55,7 +62,6 @@ class VirtualModule(ABC):
         battery_voltage = 0
         module_state = 2
 
-        # TODO: Handle 'reserved' bytes?
         health_message = parse_message(
             0, self.id, 0,
             byte_data=(

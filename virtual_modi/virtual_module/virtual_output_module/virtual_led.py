@@ -13,6 +13,8 @@ class VirtualLed(VirtualModule):
 
     def __init__(self):
         super(VirtualLed, self).__init__()
+        self.uuid = self.generate_uuid(0x4020)
+
         self.rgb = 0, 0, 0
 
     def process_set_property_message(self, message):
