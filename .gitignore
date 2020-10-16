@@ -1,5 +1,6 @@
 # dirs
 .idea/
+__pycache__/
 
 # files
 .DS_Store

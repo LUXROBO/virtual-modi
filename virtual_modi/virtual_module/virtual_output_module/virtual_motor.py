@@ -1,8 +1,8 @@
 
 from virtual_modi.virtual_module.virtual_module import VirtualModule
 
-from virtual_modi.utility.message_util import decode_message
-from virtual_modi.utility.message_util import unpack_data
+from virtual_modi.util.message_util import decode_message
+from virtual_modi.util.message_util import unpack_data
 
 
 class VirtualMotor(VirtualModule):

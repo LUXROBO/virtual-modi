@@ -1,7 +1,7 @@
 
 from importlib.util import find_spec
 
-from virtual_modi.utility.message_util import decode_message
+from virtual_modi.util.message_util import decode_message
 
 
 class VirtualBundle:
@@ -10,19 +10,21 @@ class VirtualBundle:
     """
 
     def __init__(self, modules=None):
-        if not modules:
-            # TODO: Randomly create modules of 1 network, 1 input, 1 output
-            pass
-        else:
-            # TODO: if modules are specified, create them accordingly
-            for module_name in modules:
-                module_name.title()
-
         # Create virtual modules have been initialized
         self.attached_virtual_modules = []
 
         # Messages to be sent out to the local machine (i.e. PC)
         self.external_messages = []
+
+        if not modules:
+            # TODO: Randomly create modules of 1 network, 1 input, 1 output
+            self.create_module_from_type('network')
+            self.create_module_from_type('button')
+            self.create_module_from_type('led')
+        else:
+            # TODO: if modules are specified, create them accordingly
+            for module_name in modules:
+                module_name.title()
 
     def open(self):
         # Start all threads
@@ -48,9 +50,6 @@ class VirtualBundle:
                 if curr_module_id == did:
                     virtual_module.process(msg)
                     break
-
-    def create_virtual_module(self, module_name):
-        pass
 
     #
     # Helper functions below

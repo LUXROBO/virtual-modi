@@ -3,8 +3,8 @@ from random import randint
 from abc import ABC
 from abc import abstractmethod
 
-from virtual_modi.utility.message_util import parse_message
-from virtual_modi.utility.message_util import decode_message
+from virtual_modi.util.message_util import parse_message
+from virtual_modi.util.message_util import decode_message
 
 
 class VirtualModule(ABC):
