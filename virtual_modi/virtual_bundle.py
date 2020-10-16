@@ -18,9 +18,9 @@ class VirtualBundle:
 
         if not modules:
             # TODO: Randomly create modules of 1 network, 1 input, 1 output
-            self.create_module_from_type('network')
-            self.create_module_from_type('button')
-            self.create_module_from_type('led')
+            self.create_new_module('network')
+            self.create_new_module('button')
+            self.create_new_module('led')
         else:
             # TODO: if modules are specified, create them accordingly
             for module_name in modules:
@@ -64,12 +64,12 @@ class VirtualBundle:
     @staticmethod
     def create_module_from_type(module_type):
         module_type = module_type[0].lower() + module_type[1:]
-        module_name = module_type[0].upper() + module_type[1:]
         module_path = 'virtual_modi.virtual_module.virtual'
         module_module_template = (
-            find_spec(f'{module_path}.input_module.{module_type}')
-            or find_spec(f'{module_path}.output_module.{module_type}')
-            or find_spec(f'{module_path}.setup_module.{module_type}')
+            find_spec(f'{module_path}_input_module.virtual_{module_type}')
+            or find_spec(f'{module_path}_output_module.virtual_{module_type}')
+            or find_spec(f'{module_path}_setup_module.virtual_{module_type}')
         )
         module_module = module_module_template.loader.load_module()
+        module_name = 'Virtual' + module_type[0].upper() + module_type[1:]
         return getattr(module_module, module_name)
