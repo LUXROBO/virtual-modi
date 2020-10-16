@@ -21,9 +21,10 @@ setup(
     name="virtual-modi",
     version="0.1.0",
     author="Jinsung Ha",
-    author_email="jinsung@luxrobo.com",
-    description= \
-        "Python implementation of Hanhul (Korean Language) Spell Checker",
+    author_email="jsung5381@naver.com",
+    description=(
+        "Implementation of virtual MODI modules written in Python."
+    ),
     long_description=get_readme(),
     long_description_content_type="text/markdown",
     license="MIT",
