@@ -1,6 +1,9 @@
 # dirs
 .idea/
 __pycache__/
+build/
+dist/
+*.egg-info/
 
 # files
 .DS_Store
