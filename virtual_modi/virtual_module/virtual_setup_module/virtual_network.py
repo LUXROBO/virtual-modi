@@ -13,5 +13,8 @@ class VirtualNetwork(VirtualModule):
         self.topology.pop("l")
         self.esp32_version = '1.0.0'
 
+        self.send_assignment_message()
+        self.send_topology_message()
+
     def run(self):
         self.send_health_message()
