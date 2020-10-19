@@ -16,7 +16,7 @@ class VirtualDisplay(VirtualModule):
         self.text = ''
         self.position = 0, 0
 
-        self.attached()
+        self.attach()
 
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = decode_message(message)

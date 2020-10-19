@@ -15,7 +15,7 @@ class VirtualDial(VirtualModule):
         self.degree = 0
         self.turnspeed = 0
 
-        self.attached()
+        self.attach()
 
     def run(self):
         self.send_property_message(self.DEGREE, self.degree)

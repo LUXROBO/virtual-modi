@@ -23,7 +23,7 @@ class VirtualEnv(VirtualModule):
         self.temperature = 0
         self.humidity = 0
 
-        self.attached()
+        self.attach()
 
     def run(self):
         self.send_property_message(self.BRIGHTNESS, self.brightness)

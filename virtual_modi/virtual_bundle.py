@@ -24,6 +24,17 @@ class VirtualBundle:
             self.create_new_module('network')
             self.create_new_module('button')
             self.create_new_module('led')
+
+            # A dirty hack for initializing topology map for virutal modules
+            vnetwork, vbutton, vled = (
+                self.attached_virtual_modules[0], 
+                self.attached_virtual_modules[1], 
+                self.attached_virtual_modules[2],
+            )
+            vnetwork.topology['r'] = vbutton
+            vbutton.topology['l'] = vnetwork
+            vbutton.topology['b'] = vled
+            vled.topology['t'] = vbutton
         else:
             for module_name in modules:
                 self.create_new_module(module_name.lower())

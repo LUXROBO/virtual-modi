@@ -13,7 +13,7 @@ class VirtualUltrasonic(VirtualModule):
 
         self.distance = 0
 
-        self.attached()
+        self.attach()
 
     def run(self):
         self.send_property_message(self.DISTANCE, self.distance)

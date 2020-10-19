@@ -36,7 +36,7 @@ class VirtualModule(ABC):
         """
         pass
 
-    def attached(self):
+    def attach(self):
         self.send_assignment_message()
         self.send_topology_message()
 

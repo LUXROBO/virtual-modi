@@ -15,7 +15,7 @@ class VirtualMic(VirtualModule):
         self.volume = 0
         self.frequency = 0
 
-        self.attached()
+        self.attach()
 
     def run(self):
         self.send_property_message(self.VOLUME, self.volume)

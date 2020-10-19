@@ -16,7 +16,7 @@ class VirtualButton(VirtualModule):
 
         self.is_toggled = False
 
-        self.attached()
+        self.attach()
 
     def click(self):
         self.is_toggled = not self.is_toggled

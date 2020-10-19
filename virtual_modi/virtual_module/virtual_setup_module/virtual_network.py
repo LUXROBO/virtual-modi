@@ -16,7 +16,7 @@ class VirtualNetwork(VirtualModule):
         self.send_assignment_message()
         self.send_topology_message()
 
-        self.attached()
+        self.attach()
 
     def run(self):
         pass
