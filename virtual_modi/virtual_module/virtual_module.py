@@ -23,12 +23,15 @@ class VirtualModule(ABC):
         self.messages_to_send = []
 
         # Once attached, send assignment and topology messages once
-        self.send_assignment_message()
-        self.send_topology_message()
+        #self.send_assignment_message()
+        #self.send_topology_message()
 
     @property
     def id(self):
-        return self.uuid % 0x10000
+        return self.uuid % 0xFFF
+
+    def __str__(self):
+        return f"{self.__class__.__name__} ({self.id})"
 
     @abstractmethod
     def run(self):
@@ -53,7 +56,7 @@ class VirtualModule(ABC):
 
     @staticmethod
     def generate_uuid(module_type_prefix):
-        return module_type_prefix << 32 | randint(1, 0x99999999)
+        return module_type_prefix << 32 | randint(1, 0xFFFFFFFF)
 
     def send_health_message(self):
         cpu_rate = randint(0, 100)
@@ -80,8 +83,9 @@ class VirtualModule(ABC):
         module_uuid = self.uuid.to_bytes(6, 'little')
         stm32_version = stm32_version.to_bytes(2, 'little')
         assignment_message = parse_message(
-            5, self.id, 4095, byte_data=(module_uuid, stm32_version)
+            5, self.id, 4095, byte_data=(module_uuid + stm32_version)
         )
+        print(assignment_message)
         self.messages_to_send.append(assignment_message)
 
     def send_topology_message(self):
