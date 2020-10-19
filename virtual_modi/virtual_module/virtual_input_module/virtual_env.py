@@ -23,9 +23,9 @@ class VirtualEnv(VirtualModule):
         self.temperature = 0
         self.humidity = 0
 
-    def run(self):
-        self.send_health_message()
+        self.attached()
 
+    def run(self):
         self.send_property_message(self.BRIGHTNESS, self.brightness)
         self.send_property_message(self.RED, self.red)
         self.send_property_message(self.GREEN, self.green)

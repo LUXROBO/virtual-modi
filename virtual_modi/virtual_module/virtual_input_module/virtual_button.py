@@ -16,6 +16,8 @@ class VirtualButton(VirtualModule):
 
         self.is_toggled = False
 
+        self.attached()
+
     def click(self):
         self.is_toggled = not self.is_toggled
         self.send_property_message(self.CLICKED, 100)
@@ -27,9 +29,6 @@ class VirtualButton(VirtualModule):
         self.send_property_message(self.PRESSED, 100)
 
     def run(self):
-        # Health Information
-        self.send_health_message()
-
         # Property Information
         self.send_property_message(self.CLICKED, 0)
         self.send_property_message(self.DOUBLE_CLICKED, 0)

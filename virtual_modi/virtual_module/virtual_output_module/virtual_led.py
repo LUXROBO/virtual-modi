@@ -18,6 +18,8 @@ class VirtualLed(VirtualModule):
 
         self.rgb = 0, 0, 0
 
+        self.attached()
+
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = decode_message(message)
         colors = bytes(unpack_data(data))
@@ -27,8 +29,6 @@ class VirtualLed(VirtualModule):
         self.rgb = red, green, blue
 
     def run(self):
-        self.send_health_message()
-
         r, g, b = self.rgb
         self.send_property_message(self.RED, r)
         self.send_property_message(self.GREEN, g)

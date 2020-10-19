@@ -1,4 +1,7 @@
 
+import os
+import threading as th
+
 from importlib.util import find_spec
 
 from virtual_modi.util.message_util import decode_message
@@ -17,22 +20,25 @@ class VirtualBundle:
         self.external_messages = []
 
         if not modules:
-            # TODO: Randomly create modules of 1 network, 1 input, 1 output
+            # If no module is specified, create network, button and led modules
             self.create_new_module('network')
             self.create_new_module('button')
             self.create_new_module('led')
         else:
-            # TODO: if modules are specified, create them accordingly
             for module_name in modules:
-                module_name.title()
+                self.create_new_module(module_name.lower())
+
+        self.t = None
 
     def open(self):
         # Start all threads
-        pass
+        t = th.Thread(target=self.collect_module_messages, daemon=True)
+        t.start()
 
     def close(self):
         # Kill all threads
-        pass
+        del self.t
+        os._exit(0)
 
     def send(self):
         msg_to_send = b''.join(self.external_messages)
@@ -42,11 +48,11 @@ class VirtualBundle:
     def recv(self, msg):
         _, _, did, _, _ = decode_message(msg)
         if did == 4095:
-            for virtual_module in self.attached_virtual_modules:
-                virtual_module.process_received_message(msg)
+            for current_module in self.attached_virtual_modules:
+                current_module.process_received_message(msg)
         else:
-            for virtual_module in self.attached_virtual_modules:
-                curr_module_id = virtual_module.id
+            for current_module in self.attached_virtual_modules:
+                curr_module_id = current_module.id
                 if curr_module_id == did:
                     virtual_module.process(msg)
                     break
@@ -73,3 +79,13 @@ class VirtualBundle:
         module_module = module_module_template.loader.load_module()
         module_name = 'Virtual' + module_type[0].upper() + module_type[1:]
         return getattr(module_module, module_name)
+
+    def collect_module_messages(self):
+        # Collect messages generated from each module
+        for current_module in self.attached_virtual_modules:
+            # Generate module message
+            current_module.send_health_message()
+            current_module.run()
+
+            # Collect the generated module message
+            self.external_messages.extend(current_module.messages_to_send)

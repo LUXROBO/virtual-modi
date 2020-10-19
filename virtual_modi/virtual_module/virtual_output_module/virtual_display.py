@@ -16,6 +16,8 @@ class VirtualDisplay(VirtualModule):
         self.text = ''
         self.position = 0, 0
 
+        self.attached()
+
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = decode_message(message)
         display_value = bytes(unpack_data(data))
@@ -34,4 +36,4 @@ class VirtualDisplay(VirtualModule):
                 self.text_buffer.clear()
 
     def run(self):
-        self.send_health_message()
+        pass

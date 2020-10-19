@@ -17,6 +17,8 @@ class VirtualSpeaker(VirtualModule):
 
         self.tune = 1318, 0
 
+        self.attached()
+
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = decode_message(message)
         tune = bytes(unpack_data(data))
@@ -25,8 +27,6 @@ class VirtualSpeaker(VirtualModule):
         self.tune = frequency, volume
 
     def run(self):
-        self.send_health_message()
-
         frequency, volume = self.tune
         self.send_property_message(self.FREQUENCY, frequency)
         self.send_property_message(self.VOLUME, volume)

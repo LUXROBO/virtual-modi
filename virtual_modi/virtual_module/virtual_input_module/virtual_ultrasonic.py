@@ -13,7 +13,7 @@ class VirtualUltrasonic(VirtualModule):
 
         self.distance = 0
 
-    def run(self):
-        self.send_health_message()
+        self.attached()
 
+    def run(self):
         self.send_property_message(self.DISTANCE, self.distance)

@@ -31,9 +31,9 @@ class VirtualGyro(VirtualModule):
         self.acc_z = 0
         self.vibration = 0
 
-    def run(self):
-        self.send_health_message()
+        self.attached()
 
+    def run(self):
         self.send_property_message(self.ROLL, self.roll)
         self.send_property_message(self.PITCH, self.pitch)
         self.send_property_message(self.YAW, self.yaw)

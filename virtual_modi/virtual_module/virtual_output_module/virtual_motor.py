@@ -19,6 +19,8 @@ class VirtualMotor(VirtualModule):
         self.speed = 0, 0
         self.angle = 0, 0
 
+        self.attached()
+
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = decode_message(message)
         motor_property = bytes(unpack_data(data))
@@ -38,8 +40,6 @@ class VirtualMotor(VirtualModule):
                 self.angle = 0, motor_value
 
     def run(self):
-        self.send_health_message()
-
         upper_speed, lower_speed = self.speed
         upper_angle, lower_angle = self.angle
         self.send_property_message(self.UPPER_SPEED, upper_speed)

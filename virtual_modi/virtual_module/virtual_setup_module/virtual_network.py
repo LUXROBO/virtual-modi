@@ -16,5 +16,7 @@ class VirtualNetwork(VirtualModule):
         self.send_assignment_message()
         self.send_topology_message()
 
+        self.attached()
+
     def run(self):
-        self.send_health_message()
+        pass

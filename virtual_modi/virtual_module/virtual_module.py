@@ -9,7 +9,6 @@ from virtual_modi.util.message_util import decode_message
 
 class VirtualModule(ABC):
     def __init__(self):
-
         # List static info
         self.uuid = None
         self.type = None
@@ -22,10 +21,6 @@ class VirtualModule(ABC):
         # Messages to send to the local machine (i.e. PC)
         self.messages_to_send = []
 
-        # Once attached, send assignment and topology messages once
-        #self.send_assignment_message()
-        #self.send_topology_message()
-
     @property
     def id(self):
         return self.uuid % 0xFFF
@@ -35,7 +30,15 @@ class VirtualModule(ABC):
 
     @abstractmethod
     def run(self):
+        """ 
+        While a module is alive, this `run` function defines what messages 
+        should be generated from the module.
+        """
         pass
+
+    def attached(self):
+        self.send_assignment_message()
+        self.send_topology_message()
 
     def process_received_message(self, message):
         cmd, *_ = decode_message(message)

@@ -12,7 +12,7 @@ class VirtualIr(VirtualModule):
         self.uuid = self.generate_uuid(0x2060)
         self.proximity = 0
 
-    def run(self):
-        self.send_health_message()
+        self.attached()
 
+    def run(self):
         self.send_property_message(self.PROXIMITY, self.proximity)

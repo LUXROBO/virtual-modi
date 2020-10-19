@@ -15,8 +15,8 @@ class VirtualMic(VirtualModule):
         self.volume = 0
         self.frequency = 0
 
-    def run(self):
-        self.send_health_message()
+        self.attached()
 
+    def run(self):
         self.send_property_message(self.VOLUME, self.volume)
         self.send_property_message(self.frequency, self.frequency)
