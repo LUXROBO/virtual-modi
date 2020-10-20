@@ -27,23 +27,15 @@ class VirtualBundle:
         self.external_messages = list()
 
         # Start module initialization by creating a network module at first
-        self.create_new_module('network')
+        vnetwork = self.create_new_module('network')
 
         # If no modules are specified, create network, button and led modules
         if not gui and not modules:
-            self.create_new_module('button')
-            self.create_new_module('led')
+            vbutton = self.create_new_module('button')
+            vled = self.create_new_module('led')
 
-            # A dirty hack for initializing topology map for virutal modules
-            vnetwork, vbutton, vled = (
-                self.attached_virtual_modules[0], 
-                self.attached_virtual_modules[1], 
-                self.attached_virtual_modules[2],
-            )
-            vnetwork.topology['r'] = vbutton
-            vbutton.topology['l'] = vnetwork
-            vbutton.topology['b'] = vled
-            vled.topology['t'] = vbutton
+            vnetwork.attach_module('r', vbutton)
+            vbutton.attach_module('b', vled)
         else:
             for module_name in modules:
                 self.create_new_module(module_name.lower())

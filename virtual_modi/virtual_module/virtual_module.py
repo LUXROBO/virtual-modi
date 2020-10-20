@@ -36,6 +36,23 @@ class VirtualModule(ABC):
         """
         pass
 
+    def attach_module(self, direction, module):
+        directions = ['r', 't', 'l', 'b']
+        if not direction in directions:
+            raise ValueError("Not Supported Direction Type")
+
+        # Attach input module and current module to the attached module
+        self.topology[direction] = module
+        opposite_direction_index = (
+            (directions.index(direction) + 2) % len(directions)
+        )
+        opposite_direction = directions[opposite_direction_index]
+        module.topology[opposite_direction] = self
+
+        # Once attached, send required messages
+        module.send_assignment_message()
+        module.send_topology_message()
+
     def attach(self):
         self.send_assignment_message()
         self.send_topology_message()
