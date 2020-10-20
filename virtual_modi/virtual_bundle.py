@@ -13,7 +13,10 @@ class VirtualBundle:
     A virtual interface between a local machine and the virtual network module
     """
 
-    def __init__(self, modules=None, verbose=False):
+    def __init__(self, modules=None, gui=False, verbose=False):
+        # Init flag to check if the program is running on GUI
+        self.gui = gui
+
         # Init flag decide whether to suppress messages or not
         self.verbose = verbose
 
@@ -23,9 +26,11 @@ class VirtualBundle:
         # Messages to be sent out to the local machine (i.e. PC)
         self.external_messages = list()
 
-        if not modules:
-            # If no module is specified, create network, button and led modules
-            self.create_new_module('network')
+        # Start module initialization by creating a network module at first
+        self.create_new_module('network')
+
+        # If no modules are specified, create network, button and led modules
+        if not gui and not modules:
             self.create_new_module('button')
             self.create_new_module('led')
 
