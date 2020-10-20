@@ -52,6 +52,8 @@ class VirtualBundle:
 
     def close(self):
         # Kill all threads
+
+        # TODO: Find a proper way to kill running threads
         del self.t
         os._exit(0)
 

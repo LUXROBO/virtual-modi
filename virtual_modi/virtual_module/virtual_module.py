@@ -59,6 +59,7 @@ class VirtualModule(ABC):
 
     @staticmethod
     def generate_uuid(module_type_prefix):
+        # TODO: Prohibit UUID with the last three digits of 000s for FFFs
         return module_type_prefix << 32 | randint(1, 0xFFFFFFFF)
 
     def send_health_message(self):
