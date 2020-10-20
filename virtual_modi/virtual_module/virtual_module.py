@@ -51,7 +51,7 @@ class VirtualModule(ABC):
         process_message = {
             7: self.send_topology_message,
             8: self.send_assignment_message,
-        }.get(cmd, lambda _: None)
+        }.get(cmd, lambda: None)
         process_message()
 
     def process_set_property_message(self, message):
@@ -91,8 +91,12 @@ class VirtualModule(ABC):
         self.messages_to_send.append(assignment_message)
 
     def send_topology_message(self):
-        topology_data = bytearray(8)
-        for i, (_, module_id) in enumerate(self.topology.items()):
+        topology_data = bytearray(b'\xFF')*8
+        for i, direction in enumerate(('r', 't', 'l', 'b')):
+            module = self.topology[direction]
+            if not module:
+                continue
+            module_id = module.id
             curr_module_id = module_id.to_bytes(2, 'little')
             topology_data[i*2] = curr_module_id[0]
             topology_data[i*2+1] = curr_module_id[1]

@@ -10,7 +10,6 @@ class VirtualNetwork(VirtualModule):
         self.uuid = self.generate_uuid(0x0000)
 
         # Network module specific
-        self.topology.pop("l")
         self.esp32_version = '1.0.0'
 
         self.send_assignment_message()
