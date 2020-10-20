@@ -91,7 +91,9 @@ class VirtualBundle:
             or find_spec(f'{module_path}_output_module.virtual_{module_type}')
             or find_spec(f'{module_path}_setup_module.virtual_{module_type}')
         )
-        module_module = module_module_template.loader.load_module()
+        module_module = module_module_template.loader.load_module(
+            module_module_template.name
+        )
         module_name = 'Virtual' + module_type[0].upper() + module_type[1:]
         return getattr(module_module, module_name)
 
