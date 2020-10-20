@@ -74,7 +74,7 @@ class VirtualBundle:
             for current_module in self.attached_virtual_modules:
                 curr_module_id = current_module.id
                 if curr_module_id == did:
-                    virtual_module.process(msg)
+                    current_module.process_received_message(msg)
                     break
 
     #
