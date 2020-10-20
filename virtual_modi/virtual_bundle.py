@@ -12,7 +12,12 @@ class VirtualBundle:
     A virtual interface between a local machine and the virtual network module
     """
 
-    def __init__(self, modules=None):
+    def __init__(self, modules=None, test_mode=False):
+        # Init flag to check if the program is in a test mode
+        self.test = None
+        if test_mode:
+            self.test = True
+
         # Create virtual modules have been initialized
         self.attached_virtual_modules = list()
 
@@ -79,7 +84,8 @@ class VirtualBundle:
         module_template = self.create_module_from_type(module_type)
         module_instance = module_template()
         self.attached_virtual_modules.append(module_instance)
-        print(f"{str(module_instance)} has been created!")
+        if self.test:
+            print(f"{str(module_instance)} has been created!")
         return module_instance
 
     @staticmethod
