@@ -14,10 +14,10 @@ class VirtualBundle:
 
     def __init__(self, modules=None):
         # Create virtual modules have been initialized
-        self.attached_virtual_modules = []
+        self.attached_virtual_modules = list()
 
         # Messages to be sent out to the local machine (i.e. PC)
-        self.external_messages = []
+        self.external_messages = list()
 
         if not modules:
             # If no module is specified, create network, button and led modules
@@ -39,22 +39,26 @@ class VirtualBundle:
             for module_name in modules:
                 self.create_new_module(module_name.lower())
 
-        self.t = None
+        #self.t = None
 
     def open(self):
         # Start all threads
-        t = th.Thread(target=self.collect_module_messages, daemon=True)
-        t.start()
+        #t = th.Thread(target=self.collect_module_messages, daemon=True)
+        #t.start()
+        pass
 
     def close(self):
         # Kill all threads
-        del self.t
-        os._exit(0)
+        #del self.t
+        #os._exit(0)
+        pass
 
     def send(self):
-        msg_to_send = b''.join(self.external_messages)
-        self.external_messages.clear()
-        return msg_to_send
+        self.collect_module_messages()
+
+        msg_to_send = ''.join(self.external_messages)
+        self.external_messages = []
+        return msg_to_send.encode()
 
     def recv(self, msg):
         _, _, did, _, _ = decode_message(msg)
@@ -100,3 +104,4 @@ class VirtualBundle:
 
             # Collect the generated module message
             self.external_messages.extend(current_module.messages_to_send)
+            current_module.messages_to_send.clear()
