@@ -88,7 +88,6 @@ class VirtualModule(ABC):
         assignment_message = parse_message(
             5, self.id, 4095, byte_data=(module_uuid + stm32_version)
         )
-        print(assignment_message)
         self.messages_to_send.append(assignment_message)
 
     def send_topology_message(self):
