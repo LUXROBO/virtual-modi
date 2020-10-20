@@ -1,5 +1,6 @@
 
 import os
+import time
 import threading as th
 
 from importlib.util import find_spec
@@ -44,23 +45,19 @@ class VirtualBundle:
             for module_name in modules:
                 self.create_new_module(module_name.lower())
 
-        #self.t = None
+        self.t = None
 
     def open(self):
         # Start all threads
-        #t = th.Thread(target=self.collect_module_messages, daemon=True)
-        #t.start()
-        pass
+        self.t = th.Thread(target=self.collect_module_messages, args=[0.1], daemon=True)
+        self.t.start()
 
     def close(self):
         # Kill all threads
-        #del self.t
-        #os._exit(0)
-        pass
+        del self.t
+        os._exit(0)
 
     def send(self):
-        self.collect_module_messages()
-
         msg_to_send = ''.join(self.external_messages)
         self.external_messages = []
         return msg_to_send.encode()
@@ -103,13 +100,15 @@ class VirtualBundle:
         module_name = 'Virtual' + module_type[0].upper() + module_type[1:]
         return getattr(module_module, module_name)
 
-    def collect_module_messages(self):
-        # Collect messages generated from each module
-        for current_module in self.attached_virtual_modules:
-            # Generate module message
-            current_module.send_health_message()
-            current_module.run()
+    def collect_module_messages(self, delay):
+        while True:
+            # Collect messages generated from each module
+            for current_module in self.attached_virtual_modules:
+                # Generate module message
+                current_module.send_health_message()
+                current_module.run()
 
-            # Collect the generated module message
-            self.external_messages.extend(current_module.messages_to_send)
-            current_module.messages_to_send.clear()
+                # Collect the generated module message
+                self.external_messages.extend(current_module.messages_to_send)
+                current_module.messages_to_send.clear()
+            time.sleep(delay)
