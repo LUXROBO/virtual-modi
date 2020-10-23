@@ -33,7 +33,13 @@ class VirtualBundle:
         # Start module initialization by creating a network module at first
         vnetwork = self.create_new_module('network')
 
-        # If no modules are specified, create network, button and led modules
+        # Prerequisites for several modes supported in this virtual modi
+        input_modules = [
+            'button', 'dial', 'env', 'gyro', 'ir', 'mic', 'ultrasonic'
+        ]
+        output_modules = ['display', 'led', 'motor', 'speaker']
+
+        # If no modules are specified, init defaults button and led modules
         if not gui and not modules:
             print('Generating a default set of virtual modules...')
             vbutton = self.create_new_module('button')
@@ -42,18 +48,44 @@ class VirtualBundle:
             vnetwork.attach_module('r', vbutton)
             vbutton.attach_module('b', vled)
 
+        # User explicitly specified to request randomized mode
+        elif isinstance(modules[0], str) and modules[0] == 'random':
+            # Create random number of input module random number of times
+            nb_times = randint(2, 10)
+            for i in range(nb_times):
+                if not (i % 2):
+                    random_module = input_modules[randint(
+                        0, len(input_modules) - 1
+                    )]
+                else:
+                    random_module = output_modules[randint(
+                        0, len(output_modules) - 1
+                    )]
+                random_module_instance = self.create_new_module(random_module)
+
+                # At random location, (1) Pick a module, (2) Pick a direction
+                avms = self.attached_virtual_modules
+                avms_l = len(avms)
+                j = randint(0, avms_l-1)
+                rand_parent_module = avms[j]
+                rand_parent_module.attach_module(None, random_module_instance)
+
+        # Create every module exactly once, total 12 modules including network
+        elif isinstance(modules[0], str) and modules[0] == 'all':
+            all_modules = input_modules + output_modules
+            pass
+
         # Given modules only e.g. modules = ["button", "dial", "led"]
         elif isinstance(modules[0], str) and ',' not in modules[0]:
 
-            if len(modules) > 10:
-                raise ValueError("Virtual mode supports up to 10 modules!!")
+            if len(modules) > 12:
+                raise ValueError("Virtual mode supports up to 12 modules!!")
 
             # Create instances of the specified modules
             for module_name in modules:
                 self.create_new_module(module_name.lower())
 
             # Unfortunately, the topology of the virtual modules are random
-            directions = ('r', 't', 'l', 'b')
             for i, module in enumerate(self.attached_virtual_modules):
                 # Initiate a module to be attached to the current module
                 if i == (len(self.attached_virtual_modules) - 1):
@@ -61,13 +93,12 @@ class VirtualBundle:
                 next_module = self.attached_virtual_modules[i+1]
 
                 # Attach if current module has nothing on its random direction
-                random_direction = directions[randint(0, 3)]
-                while module.topology.get(random_direction):
-                    random_direction = directions[randint(0, 3)]
-                module.attach_module(random_direction, next_module)
+                module.attach_module(None, next_module)
 
         # Given both module and directions e.g. modules=["button, r", "led, t"]
         elif isinstance(modules[0], str) and ',' in modules[0]:
+            if len(modules) > 12:
+                raise ValueError("Virtual mode supports up to 12 modules!!")
             prev_module = vnetwork
             for s in modules:
                 direction, module = s.replace(' ', '').split(',')
