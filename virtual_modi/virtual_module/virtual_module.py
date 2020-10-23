@@ -38,7 +38,7 @@ class VirtualModule(ABC):
 
     def attach_module(self, direction, module):
         directions = ['r', 't', 'l', 'b']
-        if not direction in directions:
+        if direction not in directions:
             raise ValueError("Not Supported Direction Type")
 
         # Attach input module and current module to the attached module

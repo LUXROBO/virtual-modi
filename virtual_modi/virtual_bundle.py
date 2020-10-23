@@ -3,6 +3,7 @@ import os
 import time
 import threading as th
 
+from random import randint
 from importlib.util import find_spec
 
 from virtual_modi.util.message_util import decode_message
@@ -20,6 +21,9 @@ class VirtualBundle:
         # Init flag decide whether to suppress messages or not
         self.verbose = verbose
 
+        # Init flag to notify associated threads
+        self.running = True
+
         # Create virtual modules have been initialized
         self.attached_virtual_modules = list()
 
@@ -31,28 +35,55 @@ class VirtualBundle:
 
         # If no modules are specified, create network, button and led modules
         if not gui and not modules:
+            print('Generating a default set of virtual modules...')
             vbutton = self.create_new_module('button')
             vled = self.create_new_module('led')
 
             vnetwork.attach_module('r', vbutton)
             vbutton.attach_module('b', vled)
-        else:
+
+        # Given modules only e.g. modules = ["button", "dial", "led"]
+        elif isinstance(modules[0], str) and ',' not in modules[0]:
+
+            if len(modules) > 10:
+                raise ValueError("Virtual mode supports up to 10 modules!!")
+
+            # Create instances of the specified modules
             for module_name in modules:
                 self.create_new_module(module_name.lower())
 
-        self.t = None
+            # Unfortunately, the topology of the virtual modules are random
+            directions = ('r', 't', 'l', 'b')
+            for i, module in enumerate(self.attached_virtual_modules):
+                # Initiate a module to be attached to the current module
+                if i == (len(self.attached_virtual_modules) - 1):
+                    break
+                next_module = self.attached_virtual_modules[i+1]
+
+                # Attach if current module has nothing on its random direction
+                random_direction = directions[randint(0, 3)]
+                while module.topology.get(random_direction):
+                    random_direction = directions[randint(0, 3)]
+                module.attach_module(random_direction, next_module)
+
+        # Given both module and directions e.g. modules=["button, r", "led, t"]
+        elif isinstance(modules[0], str) and ',' in modules[0]:
+            prev_module = vnetwork
+            for s in modules:
+                direction, module = s.replace(' ', '').split(',')
+                module_instance = self.create_new_module(module)
+                prev_module.attach_module(direction, module_instance)
+                prev_module = module_instance
 
     def open(self):
         # Start all threads
-        self.t = th.Thread(target=self.collect_module_messages, args=[0.1], daemon=True)
-        self.t.start()
+        th.Thread(
+            target=self.collect_module_messages, args=[0.1], daemon=True
+        ).start()
 
     def close(self):
         # Kill all threads
-
-        # TODO: Find a proper way to kill running threads
-        del self.t
-        os._exit(0)
+        self.running = False
 
     def send(self):
         msg_to_send = ''.join(self.external_messages)
@@ -60,7 +91,7 @@ class VirtualBundle:
         return msg_to_send.encode()
 
     def recv(self, msg):
-        _, _, did, _, _ = decode_message(msg)
+        _, _, did, *_ = decode_message(msg)
         if did == 4095:
             for current_module in self.attached_virtual_modules:
                 current_module.process_received_message(msg)
@@ -70,6 +101,8 @@ class VirtualBundle:
                 if curr_module_id == did:
                     current_module.process_received_message(msg)
                     break
+            else:
+                print('Cannot find a virtual module with id:', did)
 
     #
     # Helper functions below
@@ -98,7 +131,7 @@ class VirtualBundle:
         return getattr(module_module, module_name)
 
     def collect_module_messages(self, delay):
-        while True:
+        while self.running:
             # Collect messages generated from each module
             for current_module in self.attached_virtual_modules:
                 # Generate module message
