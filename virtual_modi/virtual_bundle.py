@@ -73,7 +73,13 @@ class VirtualBundle:
         # Create every module exactly once, total 12 modules including network
         elif isinstance(modules[0], str) and modules[0] == 'all':
             all_modules = input_modules + output_modules
-            pass
+            for module_name in all_modules:
+                module_instance = self.create_new_module(module_name)
+                avms = self.attached_virtual_modules
+                avms_l = len(avms)
+                j = randint(0, avms_l - 1)
+                rand_parent_module = avms[j]
+                rand_parent_module.attach_module(None, module_instance)
 
         # Given modules only e.g. modules = ["button", "dial", "led"]
         elif isinstance(modules[0], str) and ',' not in modules[0]:
