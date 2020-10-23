@@ -37,9 +37,19 @@ class VirtualModule(ABC):
         pass
 
     def attach_module(self, direction, module):
-        directions = ['r', 't', 'l', 'b']
-        if direction not in directions:
+        directions = ('r', 't', 'l', 'b')
+        if direction and direction not in directions:
             raise ValueError("Not Supported Direction Type")
+
+        # Attach the input module to self at random location
+        if not direction:
+            rand_dir_idx_max = len(directions) - 1
+            rand_dir_idx = randint(0, rand_dir_idx_max)
+            rand_dir = directions[rand_dir_idx]
+            # TODO: If all directions are occupied, this won't work
+            while self.topology.get(rand_dir):
+                rand_dir = directions[randint(0, rand_dir_idx_max)]
+            direction = rand_dir
 
         # Attach input module and current module to the attached module
         self.topology[direction] = module
