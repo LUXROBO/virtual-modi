@@ -46,7 +46,13 @@ class VirtualModule(ABC):
             rand_dir_idx_max = len(directions) - 1
             rand_dir_idx = randint(0, rand_dir_idx_max)
             rand_dir = directions[rand_dir_idx]
-            # TODO: If all directions are occupied, this won't work
+
+            # All directions are occupied, try another method
+            if all([v for k, v in self.topology.items()]):
+                raise ValueError(
+                    'All directions are occupied for current module'
+                )
+
             while self.topology.get(rand_dir):
                 rand_dir = directions[randint(0, rand_dir_idx_max)]
             direction = rand_dir
