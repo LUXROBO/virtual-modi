@@ -1,9 +1,6 @@
 
 from virtual_modi.virtual_module.virtual_module import VirtualModule
 
-from virtual_modi.util.message_util import decode_message
-from virtual_modi.util.message_util import unpack_data
-
 
 class VirtualLed(VirtualModule):
 
@@ -11,8 +8,8 @@ class VirtualLed(VirtualModule):
     GREEN = 3
     BLUE = 4
 
-    def __init__(self):
-        super(VirtualLed, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualLed, self).__init__(message_handler)
         self.type = 'led'
         self.uuid = self.generate_uuid(0x4020)
 
@@ -21,8 +18,9 @@ class VirtualLed(VirtualModule):
         self.attach()
 
     def process_set_property_message(self, message):
-        cmd, sid, did, data, dlc = decode_message(message)
-        colors = bytes(unpack_data(data))
+        cmd, sid, did, data, dlc = \
+            self.message_handler.compose_modi_message(message)
+        colors = bytes(self.message_handler.unpack_data(data))
         red = int.from_bytes(colors[0:2], byteorder='little')
         green = int.from_bytes(colors[2:4], byteorder='little')
         blue = int.from_bytes(colors[4:6], byteorder='little')

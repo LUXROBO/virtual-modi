@@ -15,8 +15,8 @@ class VirtualGyro(VirtualModule):
     ACCELERATION_Z = 10
     VIBRATION = 11
 
-    def __init__(self):
-        super(VirtualGyro, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualGyro, self).__init__(message_handler)
         self.type = 'gyro'
         self.uuid = self.generate_uuid(0x2010)
 

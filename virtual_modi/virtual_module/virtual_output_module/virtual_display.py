@@ -1,14 +1,11 @@
 
 from virtual_modi.virtual_module.virtual_module import VirtualModule
 
-from virtual_modi.util.message_util import decode_message
-from virtual_modi.util.message_util import unpack_data
-
 
 class VirtualDisplay(VirtualModule):
 
-    def __init__(self):
-        super(VirtualDisplay, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualDisplay, self).__init__(message_handler)
         self.type = 'display'
         self.uuid = self.generate_uuid(0x4000)
 
@@ -19,8 +16,9 @@ class VirtualDisplay(VirtualModule):
         self.attach()
 
     def process_set_property_message(self, message):
-        cmd, sid, did, data, dlc = decode_message(message)
-        display_value = bytes(unpack_data(data))
+        cmd, sid, did, data, dlc = \
+            self.message_handler.compose_modi_message(message)
+        display_value = bytes(self.message_handler.unpack_data(data))
         if cmd == 17:
             text = [chr(t) for t in display_value]
 

@@ -1,9 +1,6 @@
 
 from virtual_modi.virtual_module.virtual_module import VirtualModule
 
-from virtual_modi.util.message_util import decode_message
-from virtual_modi.util.message_util import unpack_data
-
 
 class VirtualMotor(VirtualModule):
 
@@ -13,8 +10,8 @@ class VirtualMotor(VirtualModule):
     LOWER_SPEED = 13
     LOWER_ANGLE = 14
 
-    def __init__(self):
-        super(VirtualMotor, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualMotor, self).__init__(message_handler)
         self.type = 'led'
         self.uuid = self.generate_uuid(0x4010)
         self.speed = 0, 0
@@ -23,8 +20,9 @@ class VirtualMotor(VirtualModule):
         self.attach()
 
     def process_set_property_message(self, message):
-        cmd, sid, did, data, dlc = decode_message(message)
-        motor_property = bytes(unpack_data(data))
+        cmd, sid, did, data, dlc = \
+            self.message_handler.compose_modi_message(message)
+        motor_property = bytes(self.message_handler.unpack_data(data))
         which_motor = int.from_bytes(motor_property[0:2], byteorder='little')
         motor_mode = int.from_bytes(motor_property[2:4], byteorder='little')
         motor_value = int.from_bytes(motor_property[4:6], byteorder='little')

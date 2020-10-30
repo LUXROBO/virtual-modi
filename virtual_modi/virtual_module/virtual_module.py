@@ -3,12 +3,9 @@ from random import randint
 from abc import ABC
 from abc import abstractmethod
 
-from virtual_modi.util.message_util import parse_message
-from virtual_modi.util.message_util import decode_message
-
 
 class VirtualModule(ABC):
-    def __init__(self):
+    def __init__(self, message_handler):
         # List static info
         self.uuid = None
         self.type = None
@@ -17,6 +14,9 @@ class VirtualModule(ABC):
         # List dynamic info
         self.topology = {'r': 0, 't': 0, 'l': 0, 'b': 0}
         self.attached = True
+
+        # Set modi message handler
+        self.message_handler = message_handler
 
         # Messages to send to the local machine (i.e. PC)
         self.messages_to_send = []
@@ -74,7 +74,7 @@ class VirtualModule(ABC):
         self.send_topology_message()
 
     def process_received_message(self, message):
-        cmd, *_ = decode_message(message)
+        cmd, *_ = self.message_handler.compose_modi_message(message)
 
         if cmd == 4:
             self.process_set_property_message(message)
@@ -102,7 +102,7 @@ class VirtualModule(ABC):
         battery_voltage = 0
         module_state = 2
 
-        health_message = parse_message(
+        health_message = self.message_handler.parse_modi_message(
             0, self.id, 0,
             byte_data=(
                 cpu_rate, bus_rate, mem_rate, battery_voltage, module_state
@@ -119,7 +119,7 @@ class VirtualModule(ABC):
         )
         module_uuid = self.uuid.to_bytes(6, 'little')
         stm32_version = stm32_version.to_bytes(2, 'little')
-        assignment_message = parse_message(
+        assignment_message = self.message_handler.parse_modi_message(
             5, self.id, 4095, byte_data=(module_uuid + stm32_version)
         )
         self.messages_to_send.append(assignment_message)
@@ -134,14 +134,14 @@ class VirtualModule(ABC):
             curr_module_id = module_id.to_bytes(2, 'little')
             topology_data[i*2] = curr_module_id[0]
             topology_data[i*2+1] = curr_module_id[1]
-        topology_message = parse_message(
+        topology_message = self.message_handler.parse_modi_message(
             7, self.id, 0, byte_data=topology_data
         )
         self.messages_to_send.append(topology_message)
 
     def send_property_message(self, property_number, property_value):
         property_value_in_bytes = property_value.to_bytes(8, 'little')
-        property_message = parse_message(
+        property_message = self.message_handler.parse_modi_message(
             31, self.id, property_number, byte_data=property_value_in_bytes
         )
         self.messages_to_send.append(property_message)

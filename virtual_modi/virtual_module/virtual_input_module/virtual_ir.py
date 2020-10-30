@@ -6,8 +6,8 @@ class VirtualIr(VirtualModule):
 
     PROXIMITY = 2
 
-    def __init__(self):
-        super(VirtualIr, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualIr, self).__init__(message_handler)
         self.type = 'ir'
         self.uuid = self.generate_uuid(0x2060)
         self.proximity = 0

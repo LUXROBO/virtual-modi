@@ -9,8 +9,8 @@ class VirtualButton(VirtualModule):
     PRESSED = 4
     TOGGLED = 5
 
-    def __init__(self):
-        super(VirtualButton, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualButton, self).__init__(message_handler)
         self.type = 'button'
         self.uuid = self.generate_uuid(0x2030)
 

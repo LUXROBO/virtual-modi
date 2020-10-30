@@ -7,8 +7,8 @@ class VirtualDial(VirtualModule):
     DEGREE = 2
     TURNSPEED = 3
 
-    def __init__(self):
-        super(VirtualDial, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualDial, self).__init__(message_handler)
         self.type = 'dial'
         self.uuid = self.generate_uuid(0x2040)
 

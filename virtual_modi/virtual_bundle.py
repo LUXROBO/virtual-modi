@@ -1,22 +1,22 @@
 
-import os
 import time
 import threading as th
 
 from random import randint
 from importlib.util import find_spec
 
-from virtual_modi.util.message_util import decode_message
+from virtual_modi.util.message_util import MessageHandler
 
 
 class VirtualBundle:
     """
-    A virtual interface between a local machine and the virtual network module
+    A virtual modi bundle which forms an interface between a local machine and
+    the virtual network module.
     """
 
-    def __init__(self, modules=None, gui=False, verbose=False):
-        # Init flag to check if the program is running on GUI
-        self.gui = gui
+    def __init__(self, modi_version=1, modules=None, verbose=False):
+        # The message handler for the virtual bundle, which imitates MODI1 or 2
+        self.modi_message_handler = MessageHandler(modi_version=modi_version)
 
         # Init flag decide whether to suppress messages or not
         self.verbose = verbose
@@ -24,7 +24,7 @@ class VirtualBundle:
         # Init flag to notify associated threads
         self.running = True
 
-        # Create virtual modules have been initialized
+        # A list which will contain created virtual modules
         self.attached_virtual_modules = list()
 
         # Messages to be sent out to the local machine (i.e. PC)
@@ -40,7 +40,7 @@ class VirtualBundle:
         output_modules = ['display', 'led', 'motor', 'speaker']
 
         # If no modules are specified, init defaults button and led modules
-        if not gui and not modules:
+        if not modules:
             print('Generating a default set of virtual modules...')
             vbutton = self.create_new_module('button')
             vled = self.create_new_module('led')
@@ -128,7 +128,7 @@ class VirtualBundle:
         return msg_to_send.encode()
 
     def recv(self, msg):
-        _, _, did, *_ = decode_message(msg)
+        _, _, did, *_ = self.modi_message_handler.compose_modi_message(msg)
         if did == 4095:
             for current_module in self.attached_virtual_modules:
                 current_module.process_received_message(msg)
@@ -146,7 +146,7 @@ class VirtualBundle:
     #
     def create_new_module(self, module_type):
         module_template = self.create_module_from_type(module_type)
-        module_instance = module_template()
+        module_instance = module_template(self.modi_message_handler)
         self.attached_virtual_modules.append(module_instance)
         if self.verbose:
             print(f"{str(module_instance)} has been created!")

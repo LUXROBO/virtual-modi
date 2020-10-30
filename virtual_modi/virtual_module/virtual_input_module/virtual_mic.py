@@ -7,8 +7,8 @@ class VirtualMic(VirtualModule):
     VOLUME = 2
     FREQUENCY = 3
 
-    def __init__(self):
-        super(VirtualMic, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualMic, self).__init__(message_handler)
         self.type = 'mic'
         self.uuid = self.generate_uuid(0x2020)
 

@@ -11,8 +11,8 @@ class VirtualEnv(VirtualModule):
     TEMPERATURE = 6
     HUMIDITY = 7
 
-    def __init__(self):
-        super(VirtualEnv, self).__init__()
+    def __init__(self, message_handler):
+        super(VirtualEnv, self).__init__(message_handler)
         self.type = 'env'
         self.uuid = self.generate_uuid(0x2000)
 
