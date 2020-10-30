@@ -174,4 +174,3 @@ class SwufMessageHandler:
                 crc <<= 1
             crc &= 0xFFFFFFFF
         return crc
-
