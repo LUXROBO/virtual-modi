@@ -6,6 +6,7 @@ from random import randint
 from importlib.util import find_spec
 
 from virtual_modi.util.message_util import MessageHandler
+from virtual_modi.util.topology_util import TopologyManager
 
 
 class VirtualBundle:
@@ -32,6 +33,9 @@ class VirtualBundle:
 
         # Start module initialization by creating a network module at first
         vnetwork = self.create_new_module('network')
+
+        # Init topology manager which contains topology graph of virtual MODIs
+        self.topology_manager = TopologyManager(self.attached_virtual_modules)
 
         # Prerequisites for several modes supported in this virtual modi
         input_modules = [
@@ -145,6 +149,9 @@ class VirtualBundle:
                     break
             else:
                 print('Cannot find a virtual module with id:', did)
+
+    def print_topology_graph(self):
+        self.topology_manager.print_topology_graph()
 
     #
     # Helper functions below
