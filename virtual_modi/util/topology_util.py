@@ -11,9 +11,34 @@ class TopologyManager:
             self.topology_graph = tp_graph
 
         def __str__(self):
-            # Print topology graph
-            print(self.topology_graph)
-            return ''
+            # Init the minimum value required to represent longest module name
+            pad_val = 25
+
+            # Construct printable_topology_graph
+            printable_topology_graph = self.topology_graph
+            for i in range(len(printable_topology_graph)):
+                for j in range(len(printable_topology_graph[0])):
+                    curr_module = printable_topology_graph[i][j]
+                    printable_name = (
+                        f'{curr_module.__str__():^{pad_val}}' if curr_module
+                        else ' '*pad_val
+                    )
+                    printable_topology_graph[i][j] = printable_name
+
+            # Format the constructed topology graph above
+            width = len(printable_topology_graph[0]) * pad_val
+            title = '[Virtual MODI Topology Graph]'
+            lines_to_print = []
+            title_line = f'{title:^{width}}'
+            border_line = '=' * width
+            lines_to_print.append(title_line)
+            lines_to_print.append(border_line)
+            for row in printable_topology_graph:
+                curr_module_line = ''.join(row)
+                lines_to_print.append(curr_module_line)
+
+            # Return the formatted printable topology graph
+            return '\n'.join(lines_to_print)
 
         @staticmethod
         def init_topology_graph(modules):
