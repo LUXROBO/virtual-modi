@@ -109,15 +109,13 @@ class TopologyManager:
 
         @staticmethod
         def calc_x_w(topology_graph):
-            x = None
+            x, w = None, None
             for i, row in enumerate(topology_graph):
                 if not x and any([module for module in row]):
                     x = i
-                    break
-            w = None
-            for i, row in enumerate(topology_graph[::-1]):
-                if not w and any([module for module in row]):
-                    w = x - i
+                    continue
+                if x and all([not module for module in row]):
+                    w = i-1
                     break
             return x, w
 
@@ -125,21 +123,19 @@ class TopologyManager:
         def calc_y_h(topology_graph):
             topology_graph_transposed = zip(*topology_graph)
 
-            y = None
+            y, h = None, None
             for j, col in enumerate(topology_graph_transposed):
                 if not y and any([module for module in col]):
                     y = j
-                    break
-            h = None
-            for j, col in enumerate(list(topology_graph_transposed)[::-1]):
-                if not h and any([module for module in col]):
-                    h = y - j
+                    continue
+                if y and all([not module for module in col]):
+                    h = j-1
                     break
             return y, h
 
         @staticmethod
         def slice_topology_graph(topology_graph, x, w, y, h):
-            return [row[y:y+h+1] for row in topology_graph[x:x+w+1]]
+            return [row[y:y+h] for row in topology_graph[x:x+w]]
 
     def __init__(self, modules):
         self.modules = modules
