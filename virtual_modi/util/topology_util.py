@@ -28,6 +28,8 @@ class TopologyManager:
             # Format the constructed topology graph above
             width = len(printable_topology_graph[0]) * pad_val
             title = '[Virtual MODI Topology Graph]'
+            if width < len(title):
+                title = title.replace('Virtual', 'Vir')
             lines_to_print = []
             title_line = f'{title:^{width}}'
             border_line = '=' * width
