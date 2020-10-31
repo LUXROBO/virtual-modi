@@ -17,9 +17,10 @@ class TopologyManager:
 
         @staticmethod
         def init_topology_graph(modules):
-            radius = len(modules)
+            radius = len(modules) - 1
+            diameter = 2 * radius + 1
             topology_graph = [
-                [None for _ in range(2 * radius)] for _ in range(2 * radius)
+                [None for _ in range(diameter)] for _ in range(diameter)
             ]
             network_module = modules[0]
             if network_module.type != 'network':
@@ -55,7 +56,7 @@ class TopologyManager:
 
         @staticmethod
         def trim_topology_graph(topology_graph):
-            return topology_graph
+            pass
 
         #
         # Helper functions are defined below
