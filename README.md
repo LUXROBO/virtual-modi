@@ -2,6 +2,7 @@
 <div align="center">
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/virtual-modi.svg?style=flat-square)](https://pypi.python.org/pypi/virtual-modi)
+[![Build Workflow Status (Github Actions)](https://img.shields.io/github/workflow/status/LUXROBO/virtual-modi/Build%20Status/main?style=flat-square)](https://github.com/LUXROBO/virtual-modi/actions)
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/LUXROBO/virtual-modi/main?style=flat-square)](https://www.codefactor.io/repository/github/luxrobo/virtual-modi/overview/main)
 [![GitHub LICENSE](https://img.shields.io/github/license/LUXROBO/virtual-modi?style=flat-square&color=blue)](https://github.com/LUXROBO/virtual-modi/blob/main/LICENSE)
 [![Lines of Code](https://img.shields.io/tokei/lines/github/LUXROBO/virtual-modi?style=flat-square)](https://github.com/LUXROBO/virtual-modi/tree/main/virtual_modi)
