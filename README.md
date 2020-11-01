@@ -30,7 +30,6 @@ conda activate virtual-modi
 
 # Make sure that your python version is compatible with VirtualMODI
 python --version
-
 ```
 
 Install the latest version of VirtualMODI:
