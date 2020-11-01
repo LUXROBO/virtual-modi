@@ -83,15 +83,16 @@ class TopologyManager:
 
         @staticmethod
         def trim_topology_graph(topology_graph):
-            # Given rows, calculate x and width
-            x, w = TopologyManager.TopologyGraph.calc_x_w(topology_graph)
+            # Given rows, calculate x and vertical length
+            x, v = TopologyManager.TopologyGraph.calc_x_v(topology_graph)
 
-            # Given cols, calculate y and height
+            # Given cols, calculate y and horizontal length
             y, h = TopologyManager.TopologyGraph.calc_y_h(topology_graph)
 
+            print(x, v, y, h)
             # Return the trimmed topology graph
             return TopologyManager.TopologyGraph.slice_topology_graph(
-                topology_graph, x, w, y, h
+                topology_graph, x, v, y, h
             )
 
         #
@@ -108,16 +109,16 @@ class TopologyManager:
             return row+x, col+y
 
         @staticmethod
-        def calc_x_w(topology_graph):
-            x, w = None, None
+        def calc_x_v(topology_graph):
+            x, v = None, None
             for i, row in enumerate(topology_graph):
                 if not x and any([module for module in row]):
                     x = i
                     continue
                 if x and all([not module for module in row]):
-                    w = i-1
+                    v = i-x
                     break
-            return x, w
+            return x, v
 
         @staticmethod
         def calc_y_h(topology_graph):
@@ -129,13 +130,13 @@ class TopologyManager:
                     y = j
                     continue
                 if y and all([not module for module in col]):
-                    h = j-1
+                    h = j-y
                     break
             return y, h
 
         @staticmethod
-        def slice_topology_graph(topology_graph, x, w, y, h):
-            return [row[y:y+h] for row in topology_graph[x:x+w]]
+        def slice_topology_graph(topology_graph, x, v, y, h):
+            return [row[y:y+h] for row in topology_graph[x:x+v]]
 
     def __init__(self, modules):
         self.modules = modules
