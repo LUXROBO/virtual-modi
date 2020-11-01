@@ -30,8 +30,8 @@ class VirtualModule(ABC):
 
     @abstractmethod
     def run(self):
-        """ 
-        While a module is alive, this `run` function defines what messages 
+        """
+        While a module is alive, this `run` function defines what messages
         should be generated from the module.
         """
         pass

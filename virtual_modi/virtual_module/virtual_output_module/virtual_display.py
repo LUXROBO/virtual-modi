@@ -27,7 +27,9 @@ class VirtualDisplay(VirtualModule):
                 self.text = ''.join(self.text_buffer)
                 self.text_buffer.clear()
         elif cmd == 21:
-            clear_status = int.from_bytes(display_value[0:2], byteorder='little')
+            clear_status = int.from_bytes(
+                display_value[0:2], byteorder='little'
+            )
             if not clear_status:
                 self.text = ''
             else:
