@@ -25,7 +25,7 @@
 # Install new python environment for VirtualMODI package, choose python version >= 3.6
 conda create --name virtual-modi python=3.6
 
-# Make sure that your python's version is compatible with PyMODI
+# Make sure that your python version is compatible with VirtualMODI
 python --version
 
 # After you properly install the python environment, activate it
