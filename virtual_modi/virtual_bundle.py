@@ -15,7 +15,12 @@ class VirtualBundle:
     the virtual network module.
     """
 
-    def __init__(self, modi_version=1, modules=None, verbose=False):
+    def __init__(
+            self, conn_type='ser', modi_version=1, modules=None, verbose=False
+    ):
+        # Init connection type, it decides the communication method
+        self.conn_type = conn_type
+
         # The message handler for the virtual bundle, which imitates MODI1 or 2
         self.modi_message_handler = MessageHandler(modi_version=modi_version)
 
