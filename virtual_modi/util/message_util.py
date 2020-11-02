@@ -161,7 +161,10 @@ class SwufMessageHandler:
     @staticmethod
     def encode_swuf_section(swuf_section):
         data_section_encoded = bytearray()
-        for data_byte in swuf_section:
+        for data_int in swuf_section:
+            data_byte = int.to_bytes(
+                data_int, byteorder='little', length=1, signed=False
+            )
             if data_byte == 0xAA:
                 data_byte = bytearray(2)
                 data_byte[0] = 0xDB
