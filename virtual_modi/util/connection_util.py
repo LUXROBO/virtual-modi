@@ -52,7 +52,7 @@ class TcpConn(Communicator):
         return self.conn.sendall(modi_message)
 
     def recv(self):
-        return self.conn.recvall()
+        return self.recvall()
 
     def recvall(self):
         data = bytearray()
