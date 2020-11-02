@@ -17,7 +17,7 @@ class VirtualDisplay(VirtualModule):
 
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = \
-            self.message_handler.compose_modi_message(message)
+            self.message_handler.unparse_modi_message(message)
         display_value = bytes(self.message_handler.unpack_data(data))
         if cmd == 17:
             text = [chr(t) for t in display_value]

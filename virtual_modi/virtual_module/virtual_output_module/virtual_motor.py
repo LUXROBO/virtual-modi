@@ -21,7 +21,7 @@ class VirtualMotor(VirtualModule):
 
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = \
-            self.message_handler.compose_modi_message(message)
+            self.message_handler.unparse_modi_message(message)
         motor_property = bytes(self.message_handler.unpack_data(data))
         which_motor = int.from_bytes(motor_property[0:2], byteorder='little')
         motor_mode = int.from_bytes(motor_property[2:4], byteorder='little')

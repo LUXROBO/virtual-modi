@@ -157,7 +157,7 @@ class VirtualBundle:
         if not msgs:
             return
         for msg in msgs:
-            _, _, did, *_ = self.modi_message_handler.compose_modi_message(msg)
+            _, _, did, *_ = self.modi_message_handler.unparse_modi_message(msg)
             if did == 4095:
                 for current_module in self.attached_virtual_modules:
                     current_module.process_received_message(msg)

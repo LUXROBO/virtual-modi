@@ -74,7 +74,7 @@ class VirtualModule(ABC):
         self.send_topology_message()
 
     def process_received_message(self, message):
-        cmd, *_ = self.message_handler.compose_modi_message(message)
+        cmd, *_ = self.message_handler.unparse_modi_message(message)
 
         if cmd == 4:
             self.process_set_property_message(message)

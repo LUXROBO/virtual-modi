@@ -19,8 +19,8 @@ class MessageHandler:
         return \
             self.message_handler.parse_modi_message(cmd, sid, did, byte_data)
 
-    def compose_modi_message(self, modi_message):
-        return self.message_handler.compose_modi_message(modi_message)
+    def unparse_modi_message(self, modi_message):
+        return self.message_handler.unparse_modi_message(modi_message)
 
     @staticmethod
     def unpack_data(data, structure=(1, 1, 1, 1, 1, 1, 1, 1)):
@@ -51,7 +51,7 @@ class JsonMessageHandler:
         return json.dumps(message)
 
     @staticmethod
-    def compose_modi_message(modi_message):
+    def unparse_modi_message(modi_message):
         cmd = modi_message['c']
         sid = modi_message['s']
         did = modi_message['d']
@@ -105,12 +105,47 @@ class SwufMessageHandler:
         cmd, sid, did,
         byte_data=(None, None, None, None, None, None, None, None)
     ):
-        header = 0xAA
-        dlc = len(byte_data)
-        clc = 0
+
+        # Encode data section
+        sid_bytes = int.to_bytes(
+            sid, byteorder='little', length=2, signed=False
+        )
+        did_bytes = int.to_bytes(
+            did, byteorder='little', length=2, signed=False
+        )
+        data_bytes = (
+            bytearray(8) if all([not B for B in byte_data])
+            else bytearray(byte_data)
+        )
+        data_section = sid_bytes + did_bytes + data_bytes
+        data_section_encoded = SwufMessageHandler.encode_swuf_section(
+            data_section
+        )
+
+        # Calculate CRC32 on the encoded data section
+        crc32_value = SwufMessageHandler.calc_crc32_complete(
+            data_section_encoded
+        )
+
+        # Encode CRC section
+        crc_section = int.to_bytes(
+            crc32_value, byteorder='little', length=4, signed=False
+        )
+        crc_section_encoded = SwufMessageHandler.encode_swuf_section(
+            crc_section
+        )
+
+        # Init header section
+        header_section = bytearray(4)
+        header_section[0] = 0xAA
+        header_section[1] = len(data_section_encoded)
+        header_section[2] = len(crc_section_encoded)
+        header_section[3] = cmd
+
+        return header_section + data_section_encoded + crc_section_encoded
 
     @staticmethod
-    def compose_modi_message(modi_message):
+    def unparse_modi_message(modi_message):
         modi_message_decoded = \
             SwufMessageHandler.decode_swuf_message(modi_message)
         dlc = modi_message_decoded[1]
@@ -123,6 +158,21 @@ class SwufMessageHandler:
     #
     # Helper functions are defined below
     #
+    @staticmethod
+    def encode_swuf_section(swuf_section):
+        data_section_encoded = bytearray()
+        for data_byte in swuf_section:
+            if data_byte == 0xAA:
+                data_byte = bytearray(2)
+                data_byte[0] = 0xDB
+                data_byte[1] = 0xDD
+            if data_byte == 0xDB:
+                data_byte = bytearray(2)
+                data_byte[0] = 0xDB
+                data_byte[1] = 0xDD
+            data_section_encoded += data_byte
+        return data_section_encoded
+
     @staticmethod
     def decode_swuf_message(swuf_message):
         decoded_message = bytearray()
@@ -151,15 +201,10 @@ class SwufMessageHandler:
         crc_given = int.from_bytes(crc_section_decoded, 'little')
 
         # Step 2. Calculate CRC32 of the encoded data section
-        data_section = swuf_message[4:4+dlc]
-        checksum = 0
-        for i in range(0, dlc, 4):
-            curr_data = data_section[i:i+4]
-            # If curr_data_section is not 32 bits, augment it with zeros
-            while len(curr_data) < 4:
-                curr_data += 0
-            checksum += SwufMessageHandler.calc_crc32(curr_data, checksum)
-        crc_obtained = checksum
+        data_section_encoded = swuf_message[4:4+dlc]
+        crc_obtained = SwufMessageHandler.calc_crc32_complete(
+            data_section_encoded
+        )
 
         # Step 3. Compare CRC given and obtained, check if they are equal
         return crc_given == crc_obtained
@@ -174,3 +219,15 @@ class SwufMessageHandler:
                 crc <<= 1
             crc &= 0xFFFFFFFF
         return crc
+
+    @staticmethod
+    def calc_crc32_complete(data):
+        checksum = 0
+        for i in range(0, len(data), 4):
+            curr_data = data[i:i + 4]
+
+            # If curr_data_section is not 32 bits, augment it with zeros
+            while len(curr_data) < 4:
+                curr_data += 0
+            checksum += SwufMessageHandler.calc_crc32(curr_data, checksum)
+        return checksum

@@ -19,7 +19,7 @@ class VirtualLed(VirtualModule):
 
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = \
-            self.message_handler.compose_modi_message(message)
+            self.message_handler.unparse_modi_message(message)
         colors = bytes(self.message_handler.unpack_data(data))
         red = int.from_bytes(colors[0:2], byteorder='little')
         green = int.from_bytes(colors[2:4], byteorder='little')

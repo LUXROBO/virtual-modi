@@ -18,7 +18,7 @@ class VirtualSpeaker(VirtualModule):
 
     def process_set_property_message(self, message):
         cmd, sid, did, data, dlc = \
-            self.message_handler.compose_modi_message(message)
+            self.message_handler.unparse_modi_message(message)
         tune = bytes(self.message_handler.unpack_data(data))
         frequency = int.from_bytes(tune[0:2], byteorder='little')
         volume = int.from_bytes(tune[2:4], byteorder='little')
