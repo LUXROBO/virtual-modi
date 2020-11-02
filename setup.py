@@ -19,7 +19,7 @@ def get_requirements():
 
 setup(
     name="virtual-modi",
-    version="0.2.0",
+    version="0.3.0",
     author="LUXROBO",
     author_email="tech@luxrobo.com",
     description=(
