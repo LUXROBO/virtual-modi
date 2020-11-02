@@ -39,7 +39,7 @@ class TcpConn(Communicator):
 
     def open(self):
         server_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
-        HOST, PORT = '', 12345
+        HOST, PORT = '127.0.0.1', 12345
         server_socket.bind((HOST, PORT))
         server_socket.listen(1)
         self.conn, addr = server_socket.accept()
@@ -49,31 +49,16 @@ class TcpConn(Communicator):
         self.conn.close()
 
     def send(self, modi_message):
-        return self.conn.send(modi_message)
+        return self.conn.sendall(modi_message)
 
     def recv(self):
-        return self.conn.recv(1024)
+        return self.conn.recvall()
 
-
-class DirConn(Communicator):
-    def __init__(self):
-        super(DirConn, self).__init__()
-        self.modi_messages = list()
-
-    def open(self):
-        pass
-
-    def close(self):
-        pass
-
-    def send(self, modi_message):
-        return modi_message
-
-    def recv(self):
-        temp = self.modi_messages[:]
-        self.modi_messages = []
-        return temp
-
-    # A helper method for direct message recv, used for PyMODI integration
-    def recv_raw(self, modi_message):
-        self.modi_messages.append(modi_message)
+    def recvall(self):
+        data = bytearray()
+        while True:
+            packet = self.conn.recv(1024)
+            if not packet:
+                break
+            data.extend(packet)
+        return data
