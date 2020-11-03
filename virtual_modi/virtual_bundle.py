@@ -18,9 +18,7 @@ class VirtualBundle:
     the virtual network module.
     """
 
-    def __init__(
-        self, conn_type='tcp', modi_version=1, modules=None, verbose=False
-    ):
+    def __init__(self, conn_type='tcp', modi_version=1, modules=None):
         # Init connection type, it decides the communication method
         self.conn = {
             'ser': SerConn(),
@@ -29,9 +27,6 @@ class VirtualBundle:
 
         # The message handler for the virtual bundle, which imitates MODI1 or 2
         self.modi_message_handler = MessageHandler(modi_version=modi_version)
-
-        # Init flag decide whether to suppress messages or not
-        self.verbose = verbose
 
         # Init flag to notify associated threads
         self.running = True
@@ -186,8 +181,7 @@ class VirtualBundle:
         module_template = self.create_module_from_type(module_type)
         module_instance = module_template(self.modi_message_handler)
         self.attached_virtual_modules.append(module_instance)
-        if self.verbose:
-            print(f"{str(module_instance)} has been created!")
+        print(f"{str(module_instance)} has been created!")
         return module_instance
 
     @staticmethod
