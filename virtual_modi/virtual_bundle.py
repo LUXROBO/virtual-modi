@@ -53,7 +53,6 @@ class VirtualBundle:
 
         # If no modules are specified, init defaults button and led modules
         if not modules:
-            print('Generating a default set of virtual modules...')
             vbutton = self.create_new_module('button')
             vled = self.create_new_module('led')
 
@@ -123,6 +122,12 @@ class VirtualBundle:
                 prev_module.attach_module(direction, module_instance)
                 prev_module = module_instance
 
+    def run(self):
+        self.conn.open()
+        while self.running:
+            time.sleep(0.1)
+        self.conn.close()
+
     def open(self):
         self.conn.open()
 
@@ -136,6 +141,7 @@ class VirtualBundle:
         )
         health_thread.start()
 
+        # Start communication threads(i.e. send and recv threads)
         th.Thread(target=self.send, args=(0.1,), daemon=True).start()
         th.Thread(target=self.recv, args=(0.1,), daemon=True).start()
 
@@ -158,7 +164,9 @@ class VirtualBundle:
             if not msgs:
                 return
             for msg in msgs:
-                _, _, did, *_ = self.modi_message_handler.unparse_modi_message(msg)
+                _, _, did, *_ = self.modi_message_handler.unparse_modi_message(
+                    msg
+                )
                 if did == 4095:
                     for current_module in self.attached_virtual_modules:
                         current_module.process_received_message(msg)
