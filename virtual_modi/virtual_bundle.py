@@ -10,7 +10,6 @@ from virtual_modi.util.topology_util import TopologyManager
 
 from virtual_modi.util.connection_util import SerConn
 from virtual_modi.util.connection_util import TcpConn
-from virtual_modi.util.connection_util import DirConn
 
 
 class VirtualBundle:
@@ -20,13 +19,12 @@ class VirtualBundle:
     """
 
     def __init__(
-        self, conn_type='ser', modi_version=1, modules=None, verbose=False
+        self, conn_type='tcp', modi_version=1, modules=None, verbose=False
     ):
         # Init connection type, it decides the communication method
         self.conn = {
             'ser': SerConn(),
             'tcp': TcpConn(),
-            'dir': DirConn(),
         }.get(conn_type)
 
         # The message handler for the virtual bundle, which imitates MODI1 or 2
@@ -49,6 +47,8 @@ class VirtualBundle:
 
         # Init topology manager which contains topology graph of virtual MODIs
         self.topology_manager = TopologyManager(self.attached_virtual_modules)
+
+        self.termination_event = th.Event()
 
         # Prerequisites for several modes supported in this virtual modi
         input_modules = [
@@ -141,34 +141,40 @@ class VirtualBundle:
         )
         health_thread.start()
 
+        th.Thread(target=self.send, args=(0.1,), daemon=True).start()
+        th.Thread(target=self.recv, args=(0.1,), daemon=True).start()
+
     def close(self):
         self.conn.close()
 
         # Kill all threads
         self.running = False
 
-    def send(self):
-        msg_to_send = ''.join(self.external_messages)
-        self.external_messages = []
-        return self.conn.send(msg_to_send.encode())
+    def send(self, delay=0):
+        while self.running:
+            msg_to_send = ''.join(self.external_messages)
+            self.external_messages = []
+            self.conn.send(msg_to_send.encode())
+            time.sleep(delay)
 
-    def recv(self):
-        msgs = self.conn.recv()
-        if not msgs:
-            return
-        for msg in msgs:
-            _, _, did, *_ = self.modi_message_handler.unparse_modi_message(msg)
-            if did == 4095:
-                for current_module in self.attached_virtual_modules:
-                    current_module.process_received_message(msg)
-            else:
-                for current_module in self.attached_virtual_modules:
-                    curr_module_id = current_module.id
-                    if curr_module_id == did:
+    def recv(self, delay=0):
+        while self.running:
+            msgs = self.conn.recv()
+            if not msgs:
+                return
+            for msg in msgs:
+                _, _, did, *_ = self.modi_message_handler.unparse_modi_message(msg)
+                if did == 4095:
+                    for current_module in self.attached_virtual_modules:
                         current_module.process_received_message(msg)
-                        break
                 else:
-                    print('Cannot find a virtual module with id:', did)
+                    for current_module in self.attached_virtual_modules:
+                        if current_module.id == did:
+                            current_module.process_received_message(msg)
+                            break
+                    else:
+                        print('Cannot find a virtual module with id:', did)
+            time.sleep(delay)
 
     def print_topology_graph(self):
         self.topology_manager.print_topology_graph()
