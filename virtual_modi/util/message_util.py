@@ -118,7 +118,7 @@ class SwufMessageHandler:
             else bytearray(byte_data)
         )
         data_section = sid_bytes + did_bytes + data_bytes
-        data_section_encoded = SwufMessageHandler.encode_swuf_section(
+        data_section_encoded = SwufMessageHandler.encode_swuf(
             data_section
         )
 
@@ -131,7 +131,7 @@ class SwufMessageHandler:
         crc_section = int.to_bytes(
             crc32_value, byteorder='little', length=4, signed=False
         )
-        crc_section_encoded = SwufMessageHandler.encode_swuf_section(
+        crc_section_encoded = SwufMessageHandler.encode_swuf(
             crc_section
         )
 
@@ -147,7 +147,7 @@ class SwufMessageHandler:
     @staticmethod
     def unparse_modi_message(modi_message):
         modi_message_decoded = \
-            SwufMessageHandler.decode_swuf_message(modi_message)
+            SwufMessageHandler.decode_swuf(modi_message)
         dlc = modi_message_decoded[1]
         cmd = modi_message_decoded[3]
         sid = int.from_bytes(modi_message_decoded[4:6], 'little')
@@ -159,36 +159,12 @@ class SwufMessageHandler:
     # Helper functions are defined below
     #
     @staticmethod
-    def encode_swuf_section(swuf_section):
-        data_section_encoded = bytearray()
-        for data_int in swuf_section:
-            data_byte = int.to_bytes(
-                data_int, byteorder='little', length=1, signed=False
-            )
-            if data_byte == 0xAA:
-                data_byte = bytearray(2)
-                data_byte[0] = 0xDB
-                data_byte[1] = 0xDD
-            if data_byte == 0xDB:
-                data_byte = bytearray(2)
-                data_byte[0] = 0xDB
-                data_byte[1] = 0xDD
-            data_section_encoded += data_byte
-        return data_section_encoded
+    def encode_swuf(swuf):
+        return swuf.replace(b'\xAA', b'\xDB\xDC').replace(b'\xDB', b'\xDB\xDD')
 
     @staticmethod
-    def decode_swuf_message(swuf_message):
-        decoded_message = bytearray()
-        for i in range(len(swuf_message)):
-            curr_byte = swuf_message[i]
-            if curr_byte == 0xDB and swuf_message[i + 1] == 0xDC:
-                curr_byte = 0xAA
-                i += 1
-            if curr_byte == 0xDB and swuf_message[i + 1] == 0xDD:
-                curr_byte = 0xDB
-                i += 1
-            decoded_message += curr_byte
-        return decoded_message
+    def decode_swuf(swuf):
+        return swuf.replace(b'\xDB\xDC', b'\xAA').replace(b'\xDB\xDD', b'\xDB')
 
     @staticmethod
     def validate_swuf_message(swuf_message, clc, dlc):
@@ -200,7 +176,7 @@ class SwufMessageHandler:
         # Step 1. Decode CRC section of the raw SWUF message
         crc_section = swuf_message[-clc:]
         crc_section_decoded = \
-            SwufMessageHandler.decode_swuf_message(crc_section)
+            SwufMessageHandler.decode_swuf(crc_section)
         crc_given = int.from_bytes(crc_section_decoded, 'little')
 
         # Step 2. Calculate CRC32 of the encoded data section
