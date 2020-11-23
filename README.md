@@ -48,5 +48,5 @@ vb = VirtualBundle()
 
 When creating the bundle object, you can optionally pass configuration parameters.
 ```python
-vb = VirtualBundle(conn_type='ser', modi_version=1)
+vb = VirtualBundle(conn_type='tcp', modi_version=1)
 ```
