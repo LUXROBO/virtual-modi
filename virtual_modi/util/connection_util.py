@@ -37,13 +37,29 @@ class SerConn(Communicator):
 
 class TcpConn(Communicator):
 
+    def __init__(self):
+        super().__init__()
+
     def open(self):
-        server_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
-        HOST, PORT = '127.0.0.1', 12345
-        server_socket.bind((HOST, PORT))
-        server_socket.listen(1)
-        self.conn, addr = server_socket.accept()
-        print('A client is connected at', addr)
+        serv_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+        serv_host, serv_port = '127.0.0.1', 12345
+        while True:
+            try:
+                serv_sock.bind((serv_host, serv_port))
+            except OSError:
+                print(
+                    'PORT num is incremented!'
+                )
+                serv_port += 1
+            else:
+                break
+
+        # Allow only one client
+        serv_sock.listen(1)
+        print('Be ready to accept a MODI software client')
+        self.conn, addr = serv_sock.accept()
+        print('A MODI software client is connected at', addr)
+        return serv_host, serv_port
 
     def close(self):
         self.conn.close()

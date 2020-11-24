@@ -1,6 +1,7 @@
 
 import time
 import threading as th
+
 from random import randint
 
 from importlib.util import find_spec
@@ -129,7 +130,8 @@ class VirtualBundle:
         self.conn.close()
 
     def open(self):
-        self.conn.open()
+        serv_host, serv_port = self.conn.open()
+        print('serv_host: {}, serv_port: {}'.format(serv_host, serv_port))
 
         # Start all threads
         property_thread = th.Thread(
