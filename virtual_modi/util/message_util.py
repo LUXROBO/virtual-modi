@@ -129,8 +129,6 @@ class SwufMessageHandler:
         )
 
         # Encode CRC section
-        #print('crc val:', crc32_value)
-        #print('crc val:', int.to_bytes(crc32_value, byteorder='little', signed=False))
         crc_section = int.to_bytes(
             crc32_value, byteorder='little', length=4, signed=False
         )
@@ -208,8 +206,7 @@ class SwufMessageHandler:
         for i in range(0, len(data), 4):
             curr_data = data[i:i + 4]
 
-            # If curr_data_section is not 32 bits, augment it with zeros
-            while len(curr_data) < 4:
-                curr_data += 0
+            # If curr_data_section is not 4 bytes length, pad it with zeros
+            curr_data += b'\0' * (4 - len(curr_data))
             checksum = SwufMessageHandler.calc_crc32(curr_data, checksum)
         return checksum
