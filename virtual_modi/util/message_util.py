@@ -106,18 +106,19 @@ class SwufMessageHandler:
         byte_data=(None, None, None, None, None, None, None, None)
     ):
 
-        # Encode data section
+        # Encode data section (sid: bytes, did: bytes, data: byte_array)
         sid_bytes = int.to_bytes(
             sid, byteorder='little', length=2, signed=False
         )
         did_bytes = int.to_bytes(
             did, byteorder='little', length=2, signed=False
         )
-        data_bytes = (
-            bytearray(8) if all([not B for B in byte_data])
-            else bytearray(byte_data)
-        )
+        data_bytes = bytes([b for b in byte_data if b])
+
+        # Concat sid, did and data
         data_section = sid_bytes + did_bytes + data_bytes
+
+        # Encode data_section
         data_section_encoded = SwufMessageHandler.encode_swuf(
             data_section
         )
@@ -128,6 +129,8 @@ class SwufMessageHandler:
         )
 
         # Encode CRC section
+        #print('crc val:', crc32_value)
+        #print('crc val:', int.to_bytes(crc32_value, byteorder='little', signed=False))
         crc_section = int.to_bytes(
             crc32_value, byteorder='little', length=4, signed=False
         )
@@ -208,5 +211,5 @@ class SwufMessageHandler:
             # If curr_data_section is not 32 bits, augment it with zeros
             while len(curr_data) < 4:
                 curr_data += 0
-            checksum += SwufMessageHandler.calc_crc32(curr_data, checksum)
+            checksum = SwufMessageHandler.calc_crc32(curr_data, checksum)
         return checksum
