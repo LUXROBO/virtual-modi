@@ -159,10 +159,12 @@ class VirtualBundle:
 
     def send(self, delay=0):
         while self.running:
-            msg_to_send = ''.join(self.external_messages)
+            if not self.external_messages:
+                time.sleep(delay)
+                continue
+            msg_to_send = b''.join(self.external_messages)
             self.external_messages = []
-            self.conn.send(msg_to_send.encode())
-            time.sleep(delay)
+            self.conn.send(msg_to_send)
 
     def recv(self, delay=0):
         while self.running:

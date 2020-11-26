@@ -58,7 +58,7 @@ class TcpConn(Communicator):
         serv_sock.listen(1)
         print('Be ready to accept a MODI software client')
         self.conn, addr = serv_sock.accept()
-        print('A MODI software client is connected at', addr)
+        print('A MODI software client is connected at addr:', addr)
         return serv_host, serv_port
 
     def close(self):

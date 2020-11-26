@@ -143,7 +143,10 @@ class SwufMessageHandler:
         header_section[2] = len(crc_section_encoded)
         header_section[3] = cmd
 
-        return header_section + data_section_encoded + crc_section_encoded
+        swuf = bytes(
+            header_section + data_section_encoded + crc_section_encoded
+        )
+        return swuf
 
     @staticmethod
     def unparse_modi_message(modi_message):
