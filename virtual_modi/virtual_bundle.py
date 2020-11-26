@@ -24,8 +24,8 @@ class VirtualBundle:
     ):
         # Init connection type, it decides the communication method
         self.conn = {
-            'ser': SerConn(),
             'tcp': TcpConn(),
+            'ser': SerConn(),
         }.get(conn_type)
 
         self.verbose = verbose
