@@ -164,7 +164,27 @@ class SwufMessageHandler:
     #
     @staticmethod
     def encode_swuf(swuf):
-        return swuf.replace(b'\xAA', b'\xDB\xDC').replace(b'\xDB', b'\xDB\xDD')
+        """
+        Unfortunately, the following does not work
+        : swuf.replace(b'\xAA', b'\xDB\xDC').replace(b'\xDB', b'\xDB\xDD')
+        Since this will replace \xAA to \xDB\xDD\xDC, which is not what we want
+        """
+
+        data_section_encoded = bytearray()
+        for data_int in swuf:
+            data_byte = int.to_bytes(
+                data_int, byteorder='little', length=1, signed=False
+            )
+            if data_byte == 0xAA:
+                data_byte = bytearray(2)
+                data_byte[0] = 0xDB
+                data_byte[1] = 0xDD
+            if data_byte == 0xDB:
+                data_byte = bytearray(2)
+                data_byte[0] = 0xDB
+                data_byte[1] = 0xDD
+            data_section_encoded += data_byte
+        return data_section_encoded
 
     @staticmethod
     def decode_swuf(swuf):
