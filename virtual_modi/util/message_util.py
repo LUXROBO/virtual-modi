@@ -48,7 +48,7 @@ class JsonMessageHandler:
         message['d'] = did
         message['b'] = JsonMessageHandler.encode_bytes(byte_data)
         message['l'] = len(byte_data)
-        return json.dumps(message)
+        return json.dumps(message).encode()
 
     @staticmethod
     def unparse_modi_message(modi_message):
