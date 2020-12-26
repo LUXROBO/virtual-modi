@@ -113,7 +113,7 @@ class SwufMessageHandler:
         did_bytes = int.to_bytes(
             did, byteorder='little', length=2, signed=False
         )
-        data_bytes = bytes([b for b in byte_data if b])
+        data_bytes = bytes([b for b in byte_data])
 
         # Concat sid, did and data
         data_section = sid_bytes + did_bytes + data_bytes
