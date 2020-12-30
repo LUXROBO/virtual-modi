@@ -156,7 +156,7 @@ class SwufMessageHandler:
         cmd = modi_message_decoded[3]
         sid = int.from_bytes(modi_message_decoded[4:6], 'little')
         did = int.from_bytes(modi_message_decoded[6:8], 'little')
-        data = int.from_bytes(modi_message_decoded[8:8 + dlc], 'little')
+        data = int.from_bytes(modi_message_decoded[8:4 + dlc], 'little')
         return cmd, sid, did, data, dlc
 
     #
