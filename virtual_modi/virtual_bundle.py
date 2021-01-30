@@ -229,11 +229,12 @@ class VirtualBundle:
                 self.external_messages.extend(current_module.messages_to_send)
                 current_module.messages_to_send.clear()
 
-    def collect_health_message(self, delay):
-        while self.running:
-            time.sleep(delay)
+    #def collect_health_message(self, delay):
+    #    while self.running:
+    #        time.sleep(delay)
 
-            for current_module in self.attached_virtual_modules:
-                current_module.send_health_message()
-                self.external_messages.extend(current_module.messages_to_send)
-                current_module.messages_to_send.clear()
+    #        for current_module in self.attached_virtual_modules:
+    #            current_module.send_health_message()
+    #            self.external_messages.extend(current_module.messages_to_send)
+    #            current_module.messages_to_send.clear()
+
