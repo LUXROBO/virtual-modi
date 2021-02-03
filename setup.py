@@ -19,9 +19,9 @@ def get_requirements():
 
 setup(
     name="virtual-modi",
-    version="0.3.1",
-    author="LUXROBO",
-    author_email="tech@luxrobo.com",
+    version='0.3.1',
+    author="Jinsung Ha",
+    author_email="jsung5381@naver.com",
     description=(
         "Implementation of virtual MODI modules written in Python."
     ),
