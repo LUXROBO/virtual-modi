@@ -18,24 +18,24 @@ def get_requirements():
 
 
 setup(
-    name="virtual-modi",
+    name='virtual-modi',
     version='0.3.1',
-    author="Jinsung Ha",
-    author_email="jsung5381@naver.com",
+    author='Jinsung Ha',
+    author_email='jsung5381@naver.com',
     description=(
-        "Implementation of virtual MODI modules written in Python."
+        'Implementation of virtual MODI modules written in Python.'
     ),
     long_description=get_readme(),
-    long_description_content_type="text/markdown",
-    license="MIT",
+    long_description_content_type='text/markdown',
+    license='MIT',
     install_requires=get_requirements(),
-    url="https://github.com/LUXROBO/virtual-modi",
+    url='https://github.com/LUXROBO/virtual-modi',
     packages=find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent"
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent'
     ],
 )
