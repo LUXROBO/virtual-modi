@@ -55,7 +55,7 @@ class SocConn(Communicator):
         return self.host, self.port
 
     def close(self):
-        self.bus.close()
+        self.bus.server_close()
 
     def recv(self):
         if self.recv_q.empty():
