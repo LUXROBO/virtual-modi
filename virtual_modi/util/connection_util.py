@@ -1,18 +1,19 @@
-
-import socket as s
+import time
 
 from abc import ABC
 from abc import abstractmethod
+
+from queue import Queue
+from threading import Thread
+
+from websocket_server import WebsocketServer
 
 
 class Communicator(ABC):
 
     def __init__(self):
-        self.conn = None
+        self.bus = None
 
-        #
-        # Abstract Methods
-        #
         @abstractmethod
         def open(self):
             pass
@@ -35,46 +36,69 @@ class SerConn(Communicator):
     pass
 
 
-class TcpConn(Communicator):
+class SocConn(Communicator):
 
     def __init__(self):
         super().__init__()
+        DEFAULT_SOC_PORT = 8765
+        self.host = ''
+        self.port = DEFAULT_SOC_PORT
+        self.bus = WebsocketServer(host=self.host, port=self.port)
+
+        self.recv_q = Queue()
+        self.send_q = Queue()
+        self.close_event = False
 
     def open(self):
-        serv_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-        serv_host, serv_port = '127.0.0.1', 12345
-        while True:
-            try:
-                serv_sock.bind((serv_host, serv_port))
-            except OSError:
-                print(
-                    'PORT num is incremented!'
-                )
-                serv_port += 1
-            else:
-                break
-
-        # Allow only one client
-        serv_sock.listen(1)
-        print('Be ready to accept a MODI software client')
-        self.conn, addr = serv_sock.accept()
-        print('A MODI software client is connected at addr:', addr)
-        return serv_host, serv_port
+        Thread(target=self.__open, daemon=True).start()
+        Thread(target=self.__send_handler, daemon=True).start()
+        return self.host, self.port
 
     def close(self):
-        self.conn.close()
-
-    def send(self, modi_message):
-        return self.conn.sendall(modi_message)
+        self.bus.close()
 
     def recv(self):
-        return self.recvall()
+        if self.recv_q.empty():
+            return None
+        modi_message = self.recv_q.get()
+        return modi_message
 
-    def recvall(self):
-        data = bytearray()
-        while True:
-            packet = self.conn.recv(1024)
-            if not packet:
-                break
-            data.extend(packet)
-        return data
+    def send(self, modi_message):
+        self.send_q.put(modi_message)
+
+    #
+    # Helper Methods
+    #
+    def __open(self):
+        def new_client(client, server):
+            server.send_message_to_all(
+                f'Hey all, a new client:{client} has joined us'
+            )
+
+        def client_left(client, server):
+            server.send_message_to_all(
+                f'Hey all, a client:{client} has left us'
+            )
+
+        # Set callback functions
+        self.bus.set_fn_new_client(new_client)
+        self.bus.set_fn_message_received(self.__recv_handler)
+        self.bus.set_fn_client_left(client_left)
+
+        # Run the server forever
+        self.bus.run_forever()
+
+    def __recv_handler(self, client, server, message):
+        self.recv_q.put(message)
+
+    def __send_handler(self):
+        while not self.close_event:
+            if self.send_q.empty():
+                time.sleep(0.001)
+                continue
+            try:
+                message = self.send_q.get()
+                self.bus.send_message_to_all(message)
+            except Exception:
+                self.close_event = True
+

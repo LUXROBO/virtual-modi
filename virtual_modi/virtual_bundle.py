@@ -8,9 +8,7 @@ from importlib.util import find_spec
 
 from virtual_modi.util.message_util import MessageHandler
 from virtual_modi.util.topology_util import TopologyManager
-
-from virtual_modi.util.connection_util import SerConn
-from virtual_modi.util.connection_util import TcpConn
+from virtual_modi.util.connection_util import SocConn, SerConn
 
 
 class VirtualBundle:
@@ -20,36 +18,31 @@ class VirtualBundle:
     """
 
     def __init__(
-        self, conn_type='tcp', modi_version=1, modules=None, verbose=False
+        self, conn_type='soc', modi_version=1, modules=None, verbose=False
     ):
         # Init connection type, it decides the communication method
         self.conn = {
-            'tcp': TcpConn(),
-            'ser': SerConn(),
+            'soc': SocConn(), 'ser': SerConn(),
         }.get(conn_type)
 
-        # Verbosity flag for debugging virtual bundle
+        self.running = True
         self.verbose = verbose
 
         # The message handler for the virtual bundle, which imitates MODI1 or 2
         self.modi_message_handler = MessageHandler(modi_version=modi_version)
 
-        # Init flag to notify associated threads
-        self.running = True
-
         # A list which will contain created virtual modules
         self.attached_virtual_modules = list()
 
-        # Messages to be sent out to the local machine (i.e. PC)
-        self.external_messages = list()
+        # Messages to be sent out to MODI client(s)
+        self.messages_to_sendout = list()
 
         # Start module initialization by creating a network module at first
         vnetwork = self.create_new_module('network')
 
-        # Init topology manager which contains topology graph of virtual MODIs
         self.topology_manager = TopologyManager(self.attached_virtual_modules)
 
-        # If no modules are specified, init defaults button and led modules
+        # If no module is specified, init button and led modules as the default
         if not modules:
             vbutton = self.create_new_module('button')
             vled = self.create_new_module('led')
@@ -72,10 +65,10 @@ class VirtualBundle:
             target=self.collect_property_message, args=(0.1,), daemon=True
         )
         property_thread.start()
-        health_thread = th.Thread(
-            target=self.collect_health_message, args=(1,), daemon=True
-        )
-        health_thread.start()
+        #health_thread = th.Thread(
+        #    target=self.collect_health_message, args=(1,), daemon=True
+        #)
+        #health_thread.start()
 
         # Start communication threads(i.e. send and recv threads)
         th.Thread(target=self.send, args=(0.1,), daemon=True).start()
@@ -84,38 +77,36 @@ class VirtualBundle:
     def close(self):
         self.conn.close()
 
-        # Kill all threads
+        # Terminate all running threads
         self.running = False
 
     def send(self, delay=0):
         while self.running:
-            if not self.external_messages:
+            if not self.messages_to_sendout:
                 time.sleep(delay)
                 continue
-            msg_to_send = b''.join(self.external_messages)
-            self.external_messages = []
-            self.conn.send(msg_to_send)
+            for message_to_sendout in self.messages_to_sendout:
+                self.conn.send(message_to_sendout)
+            self.messages_to_sendout = []
 
     def recv(self, delay=0):
         while self.running:
-            msgs = self.conn.recv()
-            if not msgs:
-                return
-            for msg in msgs:
-                _, _, did, *_ = self.modi_message_handler.unparse_modi_message(
-                    msg
-                )
-                if did == 4095:
-                    for current_module in self.attached_virtual_modules:
-                        current_module.process_received_message(msg)
-                else:
-                    for current_module in self.attached_virtual_modules:
-                        if current_module.id == did:
-                            current_module.process_received_message(msg)
-                            break
-                    else:
-                        print('Cannot find a virtual module with id:', did)
             time.sleep(delay)
+            modi_message = self.conn.recv()
+            if not modi_message:
+                return
+            _, _, did, *_ = self.modi_message_handler.unparse_modi_message(
+                modi_message
+            )
+            if did == 0xFFF:
+                for current_module in self.attached_virtual_modules:
+                    current_module.process_received_message(modi_message)
+                continue
+            target_module = self.find_module_by_id(did)
+            if not target_module:
+                print('Cannot find a virtual module with id:', did)
+                continue
+            target_module.process_received_message(modi_message)
 
     def print_topology_graph(self):
         self.topology_manager.print_topology_graph()
@@ -145,6 +136,11 @@ class VirtualBundle:
         )
         module_name = 'Virtual' + module_type[0].upper() + module_type[1:]
         return getattr(module_module, module_name)
+    
+    def find_module_by_id(self, module_id):
+        for current_module in self.attached_virtual_modules:
+            if current_module.id == module_id:
+                return current_module
 
     def collect_property_message(self, delay):
         while self.running:
@@ -156,15 +152,17 @@ class VirtualBundle:
                 current_module.run()
 
                 # Collect the generated module message
-                self.external_messages.extend(current_module.messages_to_send)
+                self.messages_to_sendout.extend(
+                    current_module.messages_to_send
+                )
                 current_module.messages_to_send.clear()
 
     #def collect_health_message(self, delay):
     #    while self.running:
     #        time.sleep(delay)
-
+    #
     #        for current_module in self.attached_virtual_modules:
     #            current_module.send_health_message()
-    #            self.external_messages.extend(current_module.messages_to_send)
+    #            self.messages_to_sendout.extend(current_module.messages_to_send)
     #            current_module.messages_to_send.clear()
 
