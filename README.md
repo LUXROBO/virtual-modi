@@ -40,13 +40,14 @@ python -m pip install virtual-modi --user
 ```
 
 ## How to Use
-Import virtual-modi package and create VirtualBundle object.
+Import virtual-modi package and create then open the VirtualBundle instance.
 ```python
 from virtual_modi import VirtualBundle
 vb = VirtualBundle()
+vb.open()
 ```
 
 When creating the bundle object, you can optionally pass configuration parameters.
 ```python
-vb = VirtualBundle(conn_type='tcp', modi_version=1)
+vb = VirtualBundle(conn_type='soc', modi_version=1)
 ```
