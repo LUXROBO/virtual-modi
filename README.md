@@ -18,7 +18,7 @@
 * Performs message generation and destruction for MODI1 and 2 modules
 * Provides MPI through various connections including serial and TCP
 
-## How to Install
+## Installation
 > When installing VirtualMODI package, we highly recommend you to use Anaconda to manage the distribution.
 > With Anaconda, you can use an isolated virtual environment, solely for VirtualMODI.
 
@@ -39,7 +39,7 @@ Install the latest version of VirtualMODI:
 python -m pip install virtual-modi --user
 ```
 
-## How to Use
+## Usage
 Import virtual-modi package and create then open the VirtualBundle instance.
 ```python
 from virtual_modi import VirtualBundle
@@ -50,4 +50,9 @@ vb.open()
 When creating the bundle object, you can optionally pass configuration parameters.
 ```python
 vb = VirtualBundle(conn_type='soc', modi_version=1)
+```
+
+Otherwise, you can use docker to run the application.
+```bash
+docker run --name virtual-modi -d --rm -it -p 8765:8765 1uxrobo/virtual-modi:0.3.1
 ```
